@@ -1,4 +1,4 @@
-import { ArrowRight, MoveRight } from "lucide-react";
+import { MoveRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Star1 from "../assets/one.png";
 import Star2 from "../assets/two.png";
