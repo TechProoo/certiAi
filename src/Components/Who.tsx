@@ -81,7 +81,7 @@ const Who = () => {
             <div className="mt-10 flex flex-col sm:flex-row sm:justify-center gap-4">
               <motion.a
                 href="/get-started"
-                className="inline-flex items-center justify-center px-15 bg-white rounded-full shadow-sm hover:shadow-md transition"
+                className="inline-flex items-center justify-center px-15 py-2 bg-white rounded-full shadow-sm hover:shadow-md transition"
                 whileHover={{ scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
