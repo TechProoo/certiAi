@@ -4,6 +4,7 @@ import Star1 from "../assets/one.png";
 import Star2 from "../assets/two.png";
 import Star3 from "../assets/three.png";
 import Star4 from "../assets/four.png";
+import { Link } from "react-router-dom";
 
 const Who = () => {
   return (
@@ -85,7 +86,9 @@ const Who = () => {
                 whileHover={{ scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <span className="font-medium">Get Started</span>
+                <Link to={"signup"} className="font-medium">
+                  Get Started
+                </Link>
                 <MoveRight className="ml-3" size={20} />
               </motion.a>
 

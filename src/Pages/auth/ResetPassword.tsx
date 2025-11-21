@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ImageArt from "../../assets/signup_img.png";
 import { Eye, EyeOff } from "lucide-react";
 
 const ResetPassword: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get("email") || "";
+  //   const [searchParams] = useSearchParams();
+  //   const email = searchParams.get("email") || "";
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
