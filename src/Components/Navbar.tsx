@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -41,12 +42,12 @@ const Navbar = () => {
             >
               API Documentation
             </a>
-            <a
-              href="/get-started"
+            <Link
+              to="/signup"
               className="text-sm px-4 py-2 rounded-md bg-white text-purple-900"
             >
               Get Started
-            </a>
+            </Link>
           </div>
 
           {/* mobile menu button */}
@@ -88,12 +89,12 @@ const Navbar = () => {
                 >
                   API Documentation
                 </a>
-                <a
-                  href="/get-started"
+                <Link
+                  to="/signup"
                   className="block text-center px-4 py-2 rounded-md bg-white text-purple-900"
                 >
                   Get Started
-                </a>
+                </Link>
               </div>
             </div>
           </motion.div>
