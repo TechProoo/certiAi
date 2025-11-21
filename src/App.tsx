@@ -6,6 +6,7 @@ import CreateAccount from "./Pages/SignUp/CreateAccount";
 import { useEffect, useState } from "react";
 import Loader from "./Components/Loader";
 import { motion } from "framer-motion";
+import Signin from "./Pages/SignUp/Signin";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -39,6 +40,7 @@ function App() {
             path="/signup/create-account"
             element={<CreateAccount />}
           ></Route>
+          <Route path="/signin" element={<Signin />}></Route>
         </Routes>
       </motion.div>
     </>

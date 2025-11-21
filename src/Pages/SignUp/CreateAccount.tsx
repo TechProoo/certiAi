@@ -2,7 +2,7 @@ import { useState } from "react";
 import ImageArt from "../../assets/signup_img.png";
 import { Eye, EyeOff } from "lucide-react";
 import Creating from "./Creating.tsx";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const CreateAccount = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -76,7 +76,7 @@ const CreateAccount = () => {
           />
         </div>
 
-        <div className="col-span-7  bg-white relative ">
+        <div className="md:col-span-7 col-span-12  bg-white relative ">
           <div className="flex justify-center items-center mt-5 mx-auto mb-5">
             <div className=" md:w-9/12 md:mx-0 mx-3 md:ml-20 m-auto">
               <div className="text-2xl absolute left-10 top-5 font-bold text-[#130D3A] mb-6">
@@ -227,9 +227,9 @@ const CreateAccount = () => {
 
                 <div className="text-xs text-center text-gray-400 mt-4">
                   Already have an account?{" "}
-                  <a href="/signin" className="text-[#130D3A] font-medium">
+                  <Link to="/signin" className="text-[#130D3A] font-medium">
                     Sign in
-                  </a>
+                  </Link>
                 </div>
               </form>
             </div>
