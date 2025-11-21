@@ -14,18 +14,14 @@ const Creating: React.FC = () => {
           />
         </div>
 
-        <div className="col-span-7 bg-white flex flex-col">
+        <div className="md:col-span-7 col-span-12 bg-white flex flex-col">
           <div className="p-12">
             <div className="text-2xl font-bold text-[#130D3A]">CertiAI</div>
           </div>
 
           <div className=" flex items-center justify-center">
             <div className="text-center md:mt-[-100px]">
-              <img
-                src={LoaderGif}
-                alt="loading"
-                className="mx-auto h-100"
-              />
+              <img src={LoaderGif} alt="loading" className="mx-auto h-100" />
               <h3 className="text-2xl heading md:mt-[-50px] font-semibold text-[#130D3A] mb-2">
                 Getting things ready for you...
               </h3>

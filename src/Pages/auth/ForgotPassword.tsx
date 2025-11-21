@@ -1,17 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import ImageArt from "../../assets/signup_img.png";
-import Creating from "./Creating";
 
-const Signin = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-  const isComplete = !!email.trim() && !!password;
+  const isComplete = !!email.trim();
 
   const validateEmail = (v: string) => /\S+@\S+\.\S+/.test(v);
 
@@ -23,17 +20,9 @@ const Signin = () => {
       setErrorMessage("Please enter a valid email address.");
       return;
     }
-    if (password.length < 8) {
-      setErrorMessage("Password must be at least 8 characters.");
-      return;
-    }
-
-    // Simulate submit: show creating loader (replace with API call)
-    console.log("Signin payload:", { email });
-    setSubmitting(true);
+    // Navigate to verification code entry page with the email as a query param
+    navigate(`/auth/verify?email=${encodeURIComponent(email)}`);
   };
-
-  if (submitting) return <Creating />;
 
   return (
     <div>
@@ -55,10 +44,10 @@ const Signin = () => {
                 </div>
                 <div className="mt-15">
                   <h2 className="text-2xl font-semibold mb-2 text-[#130D3A]">
-                    Log In
+                    Forgot password?
                   </h2>
                   <p className="text-sm text-gray-400 mb-6">
-                    Welcome back! Please enter your details.
+                    No worries, we’ll send you reset instructions.
                   </p>
                 </div>
                 <form className="space-y-4" onSubmit={handleSubmit}>
@@ -75,34 +64,6 @@ const Signin = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-gray-600 mb-2">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white placeholder-gray-300"
-                        placeholder="Enter Password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((s) => !s)}
-                        className="absolute right-3 top-2 text-gray-400"
-                      >
-                        {showPassword ? (
-                          <EyeOff size={16} />
-                        ) : (
-                          <Eye size={16} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <Link to={"forgot-password"}></Link>
-
-                  <div>
                     <button
                       type="submit"
                       disabled={!isComplete}
@@ -112,7 +73,7 @@ const Signin = () => {
                           : "bg-[#130D3AB2] border-[#130D3A] text-gray-500 cursor-not-allowed"
                       }`}
                     >
-                      Sign in
+                      Reset Password
                     </button>
                   </div>
 
@@ -122,12 +83,15 @@ const Signin = () => {
                     </div>
                   )}
 
-                  <div className="text-xs text-center text-gray-400 mt-4">
-                    New to CertiAI?{" "}
-                    <Link to="/signup" className="text-[#130D3A] font-medium">
-                      Sign up
-                    </Link>
-                  </div>
+                  <Link
+                    to="/signin"
+                    className="text-xs text-center flex gap-2 items-center justify-center text-gray-400 mt-4"
+                  >
+                    <ArrowLeft />
+                    <span className="text-[#130D3A] font-medium">
+                      Back to Login
+                    </span>
+                  </Link>
                 </form>
               </div>
             </div>
@@ -138,4 +102,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default ForgotPassword;
