@@ -11,6 +11,7 @@ import ForgotPassword from "./Pages/auth/ForgotPassword";
 import VerifyCode from "./Pages/auth/VerifyCode";
 import ResetPassword from "./Pages/auth/ResetPassword";
 import ResetSuccess from "./Pages/auth/ResetSuccess";
+import Dashboard from "./Pages/dashboard/Dashboard";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -50,8 +51,12 @@ function App() {
             element={<ForgotPassword />}
           ></Route>
           <Route path="/auth/verify" element={<VerifyCode />}></Route>
-          <Route path="/auth/reset-password" element={<ResetPassword />}></Route>
+          <Route
+            path="/auth/reset-password"
+            element={<ResetPassword />}
+          ></Route>
           <Route path="/auth/reset-success" element={<ResetSuccess />}></Route>
+          <Route path="/dashboard" element={<Dashboard />}></Route>
         </Routes>
       </motion.div>
     </>
