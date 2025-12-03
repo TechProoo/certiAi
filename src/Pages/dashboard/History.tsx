@@ -146,40 +146,95 @@ export default function VerificationHistory() {
 
           <div className="p-4">
             <div className="overflow-x-auto border rounded-md">
-              <table className="min-w-full">
-                <thead className="bg-slate-50">
-                  <tr className="text-left text-xs text-slate-500">
-                    <th className="px-6 py-3">Date</th>
-                    <th className="px-6 py-3 hidden md:block">
-                      Certificate ID
-                    </th>
-                    <th className="px-6 py-3">Name</th>
-                    <th className="px-6 py-3">Confidence</th>
-                    <th className="px-6 py-3">Status</th>
-                    <th className="px-6 py-3"></th>
-                  </tr>
-                </thead>
+              <div className="w-full overflow-x-auto">
+                <table className="min-w-full hidden md:table">
+                  <thead className="bg-slate-50">
+                    <tr className="text-left text-xs text-slate-500">
+                      <th className="px-6 py-3">Date</th>
+                      <th className="px-6 py-3">Certificate ID</th>
+                      <th className="px-6 py-3">Name</th>
+                      <th className="px-6 py-3">Confidence</th>
+                      <th className="px-6 py-3">Status</th>
+                      <th className="px-6 py-3"></th>
+                    </tr>
+                  </thead>
 
-                <tbody className="border-[#EAECF0]">
+                  <tbody className="border-[#EAECF0]">
+                    {visible.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="text-sm border-t border-[#EAECF0]"
+                      >
+                        <td className="px-6 py-4 text-xs text-slate-500">
+                          {row.date}
+                        </td>
+                        <td className="px-6 py-4 text-[#344054]">
+                          {row.certificateId}
+                        </td>
+                        <td className="px-6 py-4 text-[#344054]">{row.name}</td>
+                        <td className="px-6 py-4 text-[#344054]">
+                          {row.confidence}%
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs ${
+                              row.status === "Authentic"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : row.status === "Suspicious"
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-rose-100 text-rose-700"
+                            }`}
+                          >
+                            {row.status}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="text-slate-400 hover:text-slate-600">
+                              <MoreHorizontal size={18} />
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end" className="w-40">
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  navigate(`/dashboard/verification/${row.id}`)
+                                }
+                              >
+                                View Verification
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Download Analysis
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-rose-600"
+                                onSelect={() => {
+                                  setSelectedId(row.id);
+                                  setDeleteOpen(true);
+                                }}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Mobile View (Cards) */}
+                <div className="md:hidden space-y-4">
                   {visible.map((row) => (
-                    <tr
+                    <div
                       key={row.id}
-                      className="text-sm border-t border-[#EAECF0]"
+                      className="border border-[#EAECF0] rounded-xl p-4 shadow-sm"
                     >
-                      <td className="px-6 py-4 text-xs text-slate-500">
-                        {row.date}
-                      </td>
-                      <td className="px-6 py-4 hidden md:block text-[#344054]">
-                        {row.certificateId}
-                      </td>
-                      <td className="px-6 py-4 text-[#344054]">{row.name}</td>
-                      <td className="px-6 py-4 text-[#344054]">
-                        {row.confidence}%
-                      </td>
-
-                      <td className="px-6 py-4">
+                      <div className="flex justify-between items-center text-xs text-slate-500">
+                        <span>{row.date}</span>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs ${
+                          className={`px-2 py-1 rounded-full text-[10px] ${
                             row.status === "Authentic"
                               ? "bg-emerald-100 text-emerald-800"
                               : row.status === "Suspicious"
@@ -189,9 +244,23 @@ export default function VerificationHistory() {
                         >
                           {row.status}
                         </span>
-                      </td>
+                      </div>
 
-                      <td className="px-6 py-4 text-right">
+                      <div className="mt-2 text-sm text-[#344054]">
+                        <p>
+                          <span className="font-medium">Name:</span> {row.name}
+                        </p>
+                        <p>
+                          <span className="font-medium">Certificate ID:</span>{" "}
+                          {row.certificateId}
+                        </p>
+                        <p>
+                          <span className="font-medium">Confidence:</span>{" "}
+                          {row.confidence}%
+                        </p>
+                      </div>
+
+                      <div className="mt-3 flex justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger className="text-slate-400 hover:text-slate-600">
                             <MoreHorizontal size={18} />
@@ -219,11 +288,11 @@ export default function VerificationHistory() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
           </div>
 

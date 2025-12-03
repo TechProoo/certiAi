@@ -125,6 +125,8 @@ export default function Dashboard() {
   const [rows, setRows] = useState(initialTableData);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // visible rows (placeholder for future filtering/pagination)
+  const visible = rows;
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto pt-6">
@@ -232,14 +234,12 @@ export default function Dashboard() {
 
           {/* TABLE BODY */}
           <div className="p-4">
-            <div className="overflow-hidden rounded-md border border-[#EAECF0]">
-              <table className="min-w-full">
+            <div className="w-full overflow-x-auto">
+              <table className="min-w-full w-full table-auto hidden md:table">
                 <thead className="bg-slate-50">
                   <tr className="text-left text-xs text-slate-500">
-                    <th className="px-6 py-3">Date and Time</th>
-                    <th className="px-6 py-3 hidden md:block">
-                      Certificate ID
-                    </th>
+                    <th className="px-6 py-3">Date</th>
+                    <th className="px-6 py-3">Certificate ID</th>
                     <th className="px-6 py-3">Name</th>
                     <th className="px-6 py-3">Confidence</th>
                     <th className="px-6 py-3">Status</th>
@@ -247,38 +247,37 @@ export default function Dashboard() {
                   </tr>
                 </thead>
 
-                <tbody className="bg-white divide-y border-[#EAECF0] border di">
-                  {rows.map((row, i) => (
+                <tbody className="border-[#EAECF0]">
+                  {visible.map((row) => (
                     <tr
-                      key={i}
-                      className="text-sm text-slate-700 border border-[#EAECF0]"
+                      key={row.id}
+                      className="text-sm border-t border-[#EAECF0]"
                     >
                       <td className="px-6 py-4 text-xs text-slate-500">
                         {row.date}
                       </td>
-                      <td className="px-6 py-4 hidden md:block">{row.id}</td>
-                      <td className="px-6 py-4">{row.name}</td>
-                      <td className="px-6 py-4">{row.conf}</td>
-
-                      <td className="px-6 py-4">
-                        {row.status === "Authentic" && (
-                          <span className="inline-flex w-30 text-center justify-center items-center px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-800">
-                            Authentic
-                          </span>
-                        )}
-                        {row.status === "Suspicious" && (
-                          <span className="inline-flex w-30 text-center justify-center items-center px-3 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
-                            Suspicious
-                          </span>
-                        )}
-                        {row.status === "Forged" && (
-                          <span className="inline-flex w-30 text-center justify-center items-center px-3 py-1 rounded-full text-xs bg-rose-100 text-rose-700">
-                            Forged
-                          </span>
-                        )}
+                      <td className="px-6 py-4 text-[#344054]">
+                        {row.certificateId}
+                      </td>
+                      <td className="px-6 py-4 text-[#344054]">{row.name}</td>
+                      <td className="px-6 py-4 text-[#344054]">
+                        {row.confidence}%
                       </td>
 
-                      {/* THREE DOT MENU */}
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs ${
+                            row.status === "Authentic"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : row.status === "Suspicious"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-rose-100 text-rose-700"
+                          }`}
+                        >
+                          {row.status}
+                        </span>
+                      </td>
+
                       <td className="px-6 py-4 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger className="text-slate-400 hover:text-slate-600">
@@ -312,6 +311,73 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Mobile View (Cards) */}
+              <div className="md:hidden space-y-4">
+                {visible.map((row) => (
+                  <div
+                    key={row.id}
+                    className="border border-[#EAECF0] rounded-xl p-4 shadow-sm"
+                  >
+                    <div className="flex justify-between items-center text-xs text-slate-500">
+                      <span>{row.date}</span>
+                      <span
+                        className={`px-2 py-1 rounded-full text-[10px] ${
+                          row.status === "Authentic"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : row.status === "Suspicious"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-rose-100 text-rose-700"
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 text-sm text-[#344054]">
+                      <p>
+                        <span className="font-medium">Name:</span> {row.name}
+                      </p>
+                      <p>
+                        <span className="font-medium">Certificate ID:</span>{" "}
+                        {row.certificateId}
+                      </p>
+                      <p>
+                        <span className="font-medium">Confidence:</span>{" "}
+                        {row.confidence}%
+                      </p>
+                    </div>
+
+                    <div className="mt-3 flex justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="text-slate-400 hover:text-slate-600">
+                          <MoreHorizontal size={18} />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem
+                            onSelect={() =>
+                              navigate(`/dashboard/verification/${row.id}`)
+                            }
+                          >
+                            View Verification
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Download Analysis</DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-rose-600"
+                            onSelect={() => {
+                              setSelectedId(row.id);
+                              setDeleteOpen(true);
+                            }}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

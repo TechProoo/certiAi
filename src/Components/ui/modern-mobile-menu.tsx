@@ -18,7 +18,6 @@ const defaultItems: InteractiveMenuItem[] = [
   { label: "Upload", icon: Briefcase, path: "/dashboard/upload" },
   { label: "History", icon: Calendar, path: "/dashboard/history" },
   { label: "Reports", icon: Shield, path: "/dashboard/reports" },
-  { label: "Settings", icon: Settings, path: "/dashboard/settings" },
 ];
 
 const defaultAccentColor = "var(--component-active-color-default)";
