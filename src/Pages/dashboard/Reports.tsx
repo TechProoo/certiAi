@@ -200,7 +200,7 @@ export default function Reports() {
             Verification Status Breakdown
           </h3>
 
-          <div className="h-[240px] sm:h-[300px]">
+          <div className="h-60 sm:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barDataForRange}>
                 <CartesianGrid strokeDasharray="4 4" stroke="#F1F5F9" />

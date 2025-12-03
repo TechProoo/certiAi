@@ -138,7 +138,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto pt-6 px-2 pb-15 md:px-0 ">
+      <div className="max-w-6xl mx-auto px-0 pb-15 ">
         {/* HEADER */}
         <header className="pb-6">
           <h2 className="text-xl md:text-2xl font-semibold text-slate-900">
