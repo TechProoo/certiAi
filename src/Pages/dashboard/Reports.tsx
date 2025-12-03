@@ -13,7 +13,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  LineChart,
+  ComposedChart,
+  Area,
   Line,
 } from "recharts";
 
@@ -134,6 +135,11 @@ export default function Reports() {
 
   const barColors = ["#00C853", "#F6B73C", "#FF6B6B"]; // green, yellow, red
 
+  const fmt = (v: number | string) => {
+    if (typeof v === "number") return v.toLocaleString();
+    return v;
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto pt-6 pb-12">
@@ -201,18 +207,22 @@ export default function Reports() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={barDataForRange}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                margin={{ top: 6, right: 10, left: 0, bottom: 6 }}
+                barCategoryGap="20%"
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value">
+                <defs>
+                  <linearGradient id="barGreen" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#00C853" stopOpacity={0.9} />
+                    <stop offset="100%" stopColor="#00C853" stopOpacity={0.3} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" stroke="#F1F5F9" />
+                <XAxis dataKey="name" tick={{ fill: "#64748B", fontSize: 12 }} />
+                <YAxis tickFormatter={(v) => fmt(Number(v))} tick={{ fill: "#64748B" }} />
+                <Tooltip formatter={(v: any) => fmt(Number(v))} labelFormatter={(l) => `${l}`} />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]} animationDuration={500}>
                   {barDataForRange.map((_entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={barColors[index % barColors.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -231,39 +241,37 @@ export default function Reports() {
               </button>
             </div>
           </div>
-          <div style={{ width: "100%", height: 320 }}>
+          <div style={{ width: "100%", height: 340 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={lineDataForRange}
-                margin={{ top: 10, right: 40, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="authentic"
-                  stroke="#00C853"
-                  dot={false}
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="suspicious"
-                  stroke="#FFB74D"
-                  dot={false}
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="forged"
-                  stroke="#FF6B6B"
-                  dot={false}
-                  strokeWidth={2}
-                />
-              </LineChart>
+              <ComposedChart data={lineDataForRange} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="authGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#00C853" stopOpacity={0.18} />
+                    <stop offset="100%" stopColor="#00C853" stopOpacity={0.02} />
+                  </linearGradient>
+                  <linearGradient id="suspGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#FFB74D" stopOpacity={0.12} />
+                    <stop offset="100%" stopColor="#FFB74D" stopOpacity={0.02} />
+                  </linearGradient>
+                  <linearGradient id="forgGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#FF6B6B" stopOpacity={0.12} />
+                    <stop offset="100%" stopColor="#FF6B6B" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" stroke="#F1F5F9" />
+                <XAxis dataKey="month" tick={{ fill: "#64748B" }} />
+                <YAxis tickFormatter={(v) => fmt(Number(v))} tick={{ fill: "#64748B" }} />
+                <Tooltip formatter={(v: any) => fmt(Number(v))} labelFormatter={(l) => `${l}`} />
+                <Legend verticalAlign="top" align="right" />
+
+                <Area type="monotone" dataKey="authentic" stroke="transparent" fill="url(#authGrad)" />
+                <Area type="monotone" dataKey="suspicious" stroke="transparent" fill="url(#suspGrad)" />
+                <Area type="monotone" dataKey="forged" stroke="transparent" fill="url(#forgGrad)" />
+
+                <Line type="monotone" dataKey="authentic" stroke="#00C853" dot={{ r: 3 }} activeDot={{ r: 5 }} strokeWidth={2} />
+                <Line type="monotone" dataKey="suspicious" stroke="#FFB74D" dot={{ r: 3 }} activeDot={{ r: 5 }} strokeWidth={2} />
+                <Line type="monotone" dataKey="forged" stroke="#FF6B6B" dot={{ r: 3 }} activeDot={{ r: 5 }} strokeWidth={2} />
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
