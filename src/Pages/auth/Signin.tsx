@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import ImageArt from "../../assets/signup_img.png";
@@ -10,6 +10,7 @@ const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const isComplete = !!email.trim() && !!password;
 
@@ -31,6 +32,10 @@ const Signin = () => {
     // Simulate submit: show creating loader (replace with API call)
     console.log("Signin payload:", { email });
     setSubmitting(true);
+    // Simulate server response then navigate to dashboard
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 700);
   };
 
   if (submitting) return <Creating />;

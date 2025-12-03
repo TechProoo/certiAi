@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Home, Briefcase, Calendar, Shield, Settings } from "lucide-react";
+import { Home, Briefcase, Calendar, Shield } from "lucide-react";
 
 type IconComponentType = React.ElementType<{ className?: string }>;
 export interface InteractiveMenuItem {

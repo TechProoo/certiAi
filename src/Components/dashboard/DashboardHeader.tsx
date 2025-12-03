@@ -9,28 +9,38 @@ import {
 
 export default function DashboardHeader() {
   return (
-    <header className="w-full border-b px-8 py-2 bg-[#F8FAFC] flex items-center justify-between">
+    <header className="w-full border-b px-4 md:px-8 py-2 bg-[#F8FAFC] flex items-center justify-between">
       {/* Left Section */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
+        {/* Title */}
         <div className="flex items-center gap-2 text-gray-700 font-medium">
-          <AppWindow />
-          <h1>Dashboard</h1>
+          <AppWindow className="h-5 w-5" />
+          <h1 className="text-sm md:text-base">Dashboard</h1>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative w-64 group">
+        {/* Search Bar (hidden on mobile, appears from md upward) */}
+        <div className="relative w-40 sm:w-48 md:w-64 hidden sm:block group">
           <input
             type="text"
             placeholder="Search"
             className="w-full h-9 pl-10 pr-3 rounded-md border border-transparent bg-white text-sm text-[#130D3A] placeholder-gray-400 transition-all duration-200 ease-in-out focus:outline-none focus:shadow-sm focus:border-[#130D3A]"
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 transition-colors duration-200 group-focus-within:text-gray-600" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-gray-600" />
         </div>
+
+        {/* Mobile Search Icon */}
+        <button className="sm:hidden p-2 rounded-md hover:bg-white border">
+          <Search className="h-5 w-5 text-gray-600" />
+        </button>
       </div>
 
       {/* Right Section */}
       <div className="flex items-center gap-3">
-        <span className="text-sm text-gray-600">Hello Jayden</span>
+        {/* Hide username text on small screens */}
+        <span className="text-sm text-gray-600 hidden md:block">
+          Hello Jayden
+        </span>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild aria-label="Open user menu">
             <button className="rounded-full border p-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300">
@@ -44,8 +54,8 @@ export default function DashboardHeader() {
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="w-cover">
-            {/* Non-interactive profile header */}
+          <DropdownMenuContent align="end" className="w-56">
+            {/* Profile Section */}
             <div className="px-3 py-2">
               <div className="flex items-center gap-3">
                 <img
@@ -75,7 +85,7 @@ export default function DashboardHeader() {
 
             <DropdownMenuItem className="text-rose-600">
               <div className="flex items-center gap-2">
-                <LogOut  size={16}/>
+                <LogOut size={16} />
                 <span>Log out</span>
               </div>
             </DropdownMenuItem>

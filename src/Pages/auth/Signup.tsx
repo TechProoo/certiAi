@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Image from "../../assets/signup_img.png";
 import {
   GraduationCap,
@@ -37,6 +38,8 @@ const roles = [
 
 const Signup = () => {
   const [selected, setSelected] = useState<string | null>("institution");
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex">
@@ -128,7 +131,10 @@ const Signup = () => {
               </button>
 
               <div className="flex justify-center">
-                <button className="inline-flex items-center gap-2 bg-purple-900 hover:bg-purple-800 text-white px-12 py-3 rounded-xl">
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="inline-flex items-center gap-2 bg-purple-900 hover:bg-purple-800 text-white px-12 py-3 rounded-xl"
+                >
                   Continue <ChevronRight size={16} />
                 </button>
               </div>
