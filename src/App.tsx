@@ -12,6 +12,10 @@ import VerifyCode from "./Pages/auth/VerifyCode";
 import ResetPassword from "./Pages/auth/ResetPassword";
 import ResetSuccess from "./Pages/auth/ResetSuccess";
 import Dashboard from "./Pages/dashboard/Dashboard";
+import VerificationResult from "./Pages/dashboard/VerificationResult";
+import Upload from "./Pages/dashboard/Upload";
+import VerificationHistory from "./Pages/dashboard/History";
+import Reports from "./Pages/dashboard/Reports";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -57,6 +61,16 @@ function App() {
           ></Route>
           <Route path="/auth/reset-success" element={<ResetSuccess />}></Route>
           <Route path="/dashboard" element={<Dashboard />}></Route>
+          <Route
+            path="/dashboard/verification/:id"
+            element={<VerificationResult />}
+          ></Route>
+          <Route
+            path="/dashboard/history"
+            element={<VerificationHistory />}
+          ></Route>
+          <Route path="/dashboard/reports" element={<Reports />}></Route>
+          <Route path="/dashboard/upload" element={<Upload />}></Route>
         </Routes>
       </motion.div>
     </>

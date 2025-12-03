@@ -1,1 +1,41 @@
 @import "tailwindcss";
+
+/* Optional animation library removed - not required. If you want tw-animate-css,
+	 install it and re-add the import. */
+
+:root {
+  --component-inactive-color: var(--muted-foreground);
+  --component-bg: var(--card);
+  --component-shadow: var(--border);
+  --component-active-bg: var(--secondary);
+  --component-line-inactive-color: var(--border);
+  --component-active-color-default: var(--accent-foreground);
+}
+
+.dark {
+  --component-inactive-color: var(--muted-foreground);
+  --component-bg: var(--card);
+  --component-shadow: var(--border);
+  --component-active-bg: var(--secondary);
+  --component-line-inactive-color: var(--muted-foreground);
+  --component-active-color-default: var(--accent-foreground);
+}
+
+@keyframes iconBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-0.3em);
+  }
+  40% {
+    transform: translateY(0);
+  }
+  60% {
+    transform: translateY(-0.1em);
+  }
+  80% {
+    transform: translateY(0);
+  }
+}

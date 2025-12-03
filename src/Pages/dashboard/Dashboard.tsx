@@ -1,47 +1,134 @@
-﻿import DashboardLayout from "../../Components/dashboard/DashboardLayout";
-import { Button } from "../../Components/ui/button";
-import { Input } from "../../Components/ui/input";
-import { ShieldCheck, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+﻿"use client";
+
+import DashboardLayout from "../../Components/dashboard/DashboardLayout";
+import { useState } from "react";
+// Using native inputs/buttons here; remove unused UI imports
+import {
+  ShieldCheck,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  UploadCloud,
+  BookOpen,
+  Download,
+  MoreHorizontal,
+  ArrowRight,
+} from "lucide-react";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../Components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
 
 const stats = [
   {
     title: "Total Verified",
     value: "1,247",
-    hint: "Total certificates verified",
     icon: ShieldCheck,
-    bg: "from-blue-50 to-blue-100",
+    bg: "linear-gradient(135deg, rgba(15, 98, 254, 0.1) 0%, rgba(0, 182, 240, 0.05) 100%)",
     iconColor: "text-blue-700",
+    iconBg: "#0F62FE1A",
   },
   {
     title: "Authentic",
     value: "876",
     hint: "Authentic certificates",
+    bg: "linear-gradient(135deg, rgba(0, 201, 80, 0.1) 0%, rgba(5, 223, 114, 0.05) 100%)",
     icon: CheckCircle,
-    bg: "from-emerald-50 to-emerald-100",
     iconColor: "text-emerald-700",
+    iconBg: "#00C9501A",
   },
   {
     title: "Suspicious",
     value: "120",
     hint: "Suspicious certificates",
     icon: AlertTriangle,
-    bg: "from-amber-50 to-amber-100",
+    bg: "linear-gradient(135deg, rgba(240, 177, 0, 0.1) 0%, rgba(253, 199, 0, 0.05) 100%)",
     iconColor: "text-amber-700",
+    iconBg: "#F0B1001A",
   },
   {
     title: "Flagged",
     value: "120",
     hint: "Flagged / Forged",
     icon: XCircle,
-    bg: "from-rose-50 to-rose-100",
+    bg: "linear-gradient(135deg, rgba(251, 44, 54, 0.1) 0%, rgba(255, 100, 103, 0.05) 100%)",
     iconColor: "text-rose-700",
+    iconBg: "#FB2C361A",
+  },
+];
+
+const initialTableData = [
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "12,000",
+    status: "Authentic",
+  },
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "18,500",
+    status: "Authentic",
+  },
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "10,000",
+    status: "Authentic",
+  },
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "17,000",
+    status: "Suspicious",
+  },
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "10%",
+    status: "Forged",
+  },
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "25,000",
+    status: "Suspicious",
+  },
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "15,000",
+    status: "Authentic",
+  },
+  {
+    date: "22 Jan 2022 | 11:30 AM",
+    id: "CERT-2024-12345",
+    name: "Emma William",
+    conf: "9,800",
+    status: "Suspicious",
   },
 ];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const [rows, setRows] = useState(initialTableData);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto pt-6">
+        {/* HEADER */}
         <header className="py-6">
           <h2 className="text-2xl font-semibold text-slate-900">
             Welcome Jayden
@@ -51,13 +138,15 @@ export default function Dashboard() {
           </p>
         </header>
 
-        <section className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+        {/* STATS */}
+        <section className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-20">
           {stats.map((s) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.title}
-                className="rounded-xl p-6 bg-white shadow-sm border"
+                className="rounded-xl p-6 shadow-sm border"
+                style={{ background: s.bg }}
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -67,110 +156,221 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-white/60 shadow-sm">
+                  <div className="h-12 w-12 rounded-xl flex items-center justify-center">
                     <div
-                      className={`h-9 w-9 rounded-lg flex items-center justify-center ${s.iconColor} bg-white`}
+                      className={`h-12 w-12 rounded-lg flex items-center justify-center ${s.iconColor}`}
+                      style={{ background: s.iconBg }}
                     >
                       <Icon size={18} />
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 text-xs text-slate-400">{s.hint}</div>
               </div>
             );
           })}
         </section>
 
-        <section className="mb-8">
+        {/* QUICK ACTIONS */}
+        <section className="mb-20">
           <h3 className="text-sm font-medium text-slate-700 mb-3">
             Quick Actions
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 bg-white rounded-lg shadow-sm border flex items-center gap-4">
-              <div className="h-10 w-10 flex items-center justify-center rounded border bg-blue-50 text-blue-600">
-                ⇪
-              </div>
-              <div>
-                <div className="text-sm font-medium">Upload Certificate</div>
-                <div className="text-xs text-slate-400">
-                  Upload a new certificate file for verification
+
+          <div className="md:w-10/12">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Upload */}
+              <div className="relative p-4 bg-white rounded-xl shadow-sm border overflow-hidden">
+                <span className="absolute -inset-3 rounded-lg blur-3xl opacity-20 bg-blue-100" />
+                <div className="relative h-10 w-10 flex items-center justify-center rounded-md bg-blue-50 text-blue-600">
+                  <UploadCloud size={18} />
+                </div>
+                <div className="mt-2 text-sm font-medium text-slate-900">
+                  Upload Certificate
                 </div>
               </div>
-            </div>
 
-            <div className="p-4 bg-white rounded-lg shadow-sm border flex items-center gap-4">
-              <div className="h-10 w-10 flex items-center justify-center rounded border bg-emerald-50 text-emerald-600">
-                API
-              </div>
-              <div>
-                <div className="text-sm font-medium">API Documentation</div>
-                <div className="text-xs text-slate-400">
-                  Integrate verification with our API
+              {/* Docs */}
+              <div className="relative p-4 bg-white rounded-xl shadow-sm border overflow-hidden">
+                <span className="absolute -inset-3 rounded-lg blur-3xl opacity-20 bg-emerald-100" />
+                <div className="relative h-10 w-10 flex items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
+                  <BookOpen size={18} />
+                </div>
+                <div className="mt-2 text-sm font-medium text-slate-900">
+                  API Documentation
                 </div>
               </div>
-            </div>
 
-            <div className="p-4 bg-white rounded-lg shadow-sm border flex items-center gap-4">
-              <div className="h-10 w-10 flex items-center justify-center rounded border bg-amber-50 text-amber-600">
-                ⬇
-              </div>
-              <div>
-                <div className="text-sm font-medium">Download Reports</div>
-                <div className="text-xs text-slate-400">
-                  Export verification reports
+              {/* Reports */}
+              <div className="relative p-4 bg-white rounded-xl shadow-sm border overflow-hidden">
+                <span className="absolute -inset-3 rounded-lg blur-3xl opacity-20 bg-amber-100" />
+                <div className="relative h-10 w-10 flex items-center justify-center rounded-md bg-amber-50 text-amber-600">
+                  <Download size={18} />
+                </div>
+                <div className="mt-2 text-sm font-medium text-slate-900">
+                  Download Reports
                 </div>
               </div>
             </div>
           </div>
         </section>
 
+        {/* TABLE */}
         <section className="bg-white rounded-lg shadow-sm border">
+          {/* TABLE HEADER */}
           <div className="flex items-center justify-between p-4 border-b">
             <h4 className="font-medium text-slate-800">Recent Verifications</h4>
             <div className="flex items-center gap-3">
-              <Input placeholder="Search" className="w-60" />
-              <Button variant="outline">Filter by</Button>
+              <input
+                placeholder="Search"
+                className="w-60 rounded-sm border border-[#EAECF0] px-3 py-2 text-sm focus:outline-none focus:border-[#727273] text-[#727273] focus:ring-[#EAECF0] focus:ring-offset-1"
+              />
+              <button className="border rounded-sm px-3 py-2 text-xs font-bold border-[#EAECF0] text-[#344054]  focus:border-[#727273] focus:outline-none focus:ring-[#727273] focus:ring-offset-1">
+                Filter by
+              </button>
             </div>
           </div>
 
-          <div className="overflow-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs text-slate-500 border-b">
-                <tr>
-                  <th className="py-3 px-4">Date and Time</th>
-                  <th className="py-3 px-4">Certificate ID</th>
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-4">Confidence</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4"></th>
-                </tr>
-              </thead>
-              <tbody className="text-slate-700">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} className="border-b last:border-0">
-                    <td className="py-3 px-4 text-xs text-slate-500">
-                      22 Jan 2022 | 11:30 AM
-                    </td>
-                    <td className="py-3 px-4">CERT-2024-12345</td>
-                    <td className="py-3 px-4">Emma William</td>
-                    <td className="py-3 px-4">{(i + 1) * 1000}</td>
-                    <td className="py-3 px-4">
-                      <span className="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-800">
-                        Authentic
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">•••</td>
+          {/* TABLE BODY */}
+          <div className="p-4">
+            <div className="overflow-hidden rounded-md border border-[#EAECF0]">
+              <table className="min-w-full">
+                <thead className="bg-slate-50">
+                  <tr className="text-left text-xs text-slate-500">
+                    <th className="px-6 py-3">Date and Time</th>
+                    <th className="px-6 py-3 hidden md:block">
+                      Certificate ID
+                    </th>
+                    <th className="px-6 py-3">Name</th>
+                    <th className="px-6 py-3">Confidence</th>
+                    <th className="px-6 py-3">Status</th>
+                    <th className="px-6 py-3"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody className="bg-white divide-y border-[#EAECF0] border di">
+                  {rows.map((row, i) => (
+                    <tr
+                      key={i}
+                      className="text-sm text-slate-700 border border-[#EAECF0]"
+                    >
+                      <td className="px-6 py-4 text-xs text-slate-500">
+                        {row.date}
+                      </td>
+                      <td className="px-6 py-4 hidden md:block">{row.id}</td>
+                      <td className="px-6 py-4">{row.name}</td>
+                      <td className="px-6 py-4">{row.conf}</td>
+
+                      <td className="px-6 py-4">
+                        {row.status === "Authentic" && (
+                          <span className="inline-flex w-30 text-center justify-center items-center px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-800">
+                            Authentic
+                          </span>
+                        )}
+                        {row.status === "Suspicious" && (
+                          <span className="inline-flex w-30 text-center justify-center items-center px-3 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
+                            Suspicious
+                          </span>
+                        )}
+                        {row.status === "Forged" && (
+                          <span className="inline-flex w-30 text-center justify-center items-center px-3 py-1 rounded-full text-xs bg-rose-100 text-rose-700">
+                            Forged
+                          </span>
+                        )}
+                      </td>
+
+                      {/* THREE DOT MENU */}
+                      <td className="px-6 py-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="text-slate-400 hover:text-slate-600">
+                            <MoreHorizontal size={18} />
+                          </DropdownMenuTrigger>
+
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem
+                              onSelect={() =>
+                                navigate(`/dashboard/verification/${row.id}`)
+                              }
+                            >
+                              View Verification
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              Download Analysis
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-rose-600"
+                              onSelect={() => {
+                                setSelectedId(row.id);
+                                setDeleteOpen(true);
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <div className="p-4 text-center border-t">
-            <Button variant="link">View all Verifications →</Button>
+          {/* FOOTER */}
+          <div className="p-4 text-center flex justify-center border-t">
+            <button className="border-[#EAECF0] border flex gap-2 justify-center focus:border-[#727273] items-center text-xs font-bold rounded-sm px-3 py-2  text-[#344054]">
+              View all Verifications <ArrowRight size={18} />
+            </button>
           </div>
         </section>
       </div>
+      {/* Delete confirmation modal */}
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="fixed inset-0 bg-black/60"
+            onClick={() => setDeleteOpen(false)}
+          />
+
+          <div className="relative bg-white rounded-md text-center shadow-lg w-[420px]">
+            <div className="p-4 border-b">
+              <h3 className="text-base font-semibold text-[#101828]">
+                Delete Verification Result
+              </h3>
+            </div>
+
+            <div className="p-6">
+              <p className="text-sm text-slate-600 mb-4">
+                Are you sure you want to Delete this verification Result
+              </p>
+              <div className="flex gap-3 justify-center mt-5">
+                <button
+                  className="px-10 py-2 rounded-md bg-emerald-600 text-white"
+                  onClick={() => {
+                    setSelectedId(null);
+                    setDeleteOpen(false);
+                  }}
+                >
+                  No, Cancel
+                </button>
+
+                <button
+                  className="px-10 py-2 rounded-md bg-rose-600 text-white"
+                  onClick={() => {
+                    if (selectedId)
+                      setRows((prev) =>
+                        prev.filter((r) => r.id !== selectedId)
+                      );
+                    setSelectedId(null);
+                    setDeleteOpen(false);
+                  }}
+                >
+                  Yes, Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
