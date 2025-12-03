@@ -126,7 +126,7 @@ export default function VerificationHistory() {
         </p>
 
         <section className="bg-white rounded-lg shadow-sm border">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-1 border-b gap-3">
             <h4 className="font-medium text-slate-800">
               Verification History Table
             </h4>
@@ -144,7 +144,7 @@ export default function VerificationHistory() {
             </div>
           </div>
 
-          <div className="p-4">
+          <div className="p-1">
             <div className="overflow-x-auto border rounded-md">
               <div className="w-full overflow-x-auto">
                 <table className="min-w-full hidden md:table">

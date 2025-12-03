@@ -18,6 +18,7 @@ import {
   Line,
 } from "recharts";
 
+/* ------------------ STATS ------------------ */
 const stats = [
   {
     title: "Total Verified",
@@ -30,16 +31,14 @@ const stats = [
   {
     title: "Authentic",
     value: "876",
-    hint: "Authentic certificates",
-    bg: "linear-gradient(135deg, rgba(0, 201, 80, 0.1) 0%, rgba(5, 223, 114, 0.05) 100%)",
     icon: CheckCircle,
+    bg: "linear-gradient(135deg, rgba(0, 201, 80, 0.1) 0%, rgba(5, 223, 114, 0.05) 100%)",
     iconColor: "text-emerald-700",
     iconBg: "#00C9501A",
   },
   {
     title: "Suspicious",
     value: "120",
-    hint: "Suspicious certificates",
     icon: AlertTriangle,
     bg: "linear-gradient(135deg, rgba(240, 177, 0, 0.1) 0%, rgba(253, 199, 0, 0.05) 100%)",
     iconColor: "text-amber-700",
@@ -48,15 +47,12 @@ const stats = [
   {
     title: "Flagged",
     value: "120",
-    hint: "Flagged / Forged",
     icon: XCircle,
     bg: "linear-gradient(135deg, rgba(251, 44, 54, 0.1) 0%, rgba(255, 100, 103, 0.05) 100%)",
     iconColor: "text-rose-700",
     iconBg: "#FB2C361A",
   },
 ];
-
-// barData removed; per-range data is provided by `barDataForRange`
 
 const lineData = [
   { month: "Jan", authentic: 200, suspicious: 120, forged: 80 },
@@ -116,7 +112,6 @@ export default function Reports() {
   }, [range]);
 
   const lineDataForRange = useMemo(() => {
-    // keep same months but scale by range
     const multiplier =
       range === "today"
         ? 0.02
@@ -125,6 +120,7 @@ export default function Reports() {
         : range === "month"
         ? 0.6
         : 1;
+
     return lineData.map((d) => ({
       month: d.month,
       authentic: Math.round(d.authentic * multiplier),
@@ -133,33 +129,33 @@ export default function Reports() {
     }));
   }, [range]);
 
-  const barColors = ["#00C853", "#F6B73C", "#FF6B6B"]; // green, yellow, red
-
-  const fmt = (v: number | string) => {
-    if (typeof v === "number") return v.toLocaleString();
-    return v;
-  };
+  const barColors = ["#00C853", "#F6B73C", "#FF6B6B"];
+  const fmt = (v: any) => (typeof v === "number" ? v.toLocaleString() : v);
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto pt-6 pb-12">
-        <div className="flex items-start justify-between gap-6 mb-6">
+      <div className="max-w-6xl mx-auto pb-12 sm:px-6 lg:px-0">
+        {/* ------------ HEADER ------------ */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Reports</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">
+              Reports
+            </h2>
             <p className="text-sm text-slate-500">
-              View and Download verification Activities summary
+              View & Download verification summaries
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Filter Buttons (scrollable on mobile) */}
+          <div className="flex items-center gap-2 overflow-x-auto px-1 sm:px-0">
             {ranges.map((r) => (
               <button
                 key={r.key}
                 onClick={() => setRange(r.key)}
-                className={`px-3 py-1 text-sm rounded-md border ${
+                className={`shrink-0 px-3 py-1 text-xs sm:text-sm rounded-md border ${
                   range === r.key
-                    ? "bg-blue-50 text-blue-700 border-blue-200 shadow-sm"
-                    : "bg-white text-slate-700"
+                    ? "bg-blue-50 text-blue-700 border-blue-200 shadow"
+                    : "bg-white text-slate-700 border-[#EAECF0]"
                 }`}
               >
                 {r.label}
@@ -168,30 +164,29 @@ export default function Reports() {
           </div>
         </div>
 
-        <section className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-20">
+        {/* ------------ STATS GRID ------------ */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {stats.map((s) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.title}
-                className="rounded-xl p-6 shadow-sm border"
+                className="rounded-xl p-5 shadow-sm border"
                 style={{ background: s.bg }}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between items-start">
                   <div>
-                    <div className="text-xs text-slate-400">{s.title}</div>
-                    <div className="text-2xl font-extrabold mt-3 text-slate-900">
+                    <p className="text-xs text-slate-400">{s.title}</p>
+                    <p className="text-xl md:text-2xl font-extrabold mt-3 text-slate-900">
                       {s.value}
-                    </div>
+                    </p>
                   </div>
 
-                  <div className="h-12 w-12 rounded-xl flex items-center justify-center">
-                    <div
-                      className={`h-12 w-12 rounded-lg flex items-center justify-center ${s.iconColor}`}
-                      style={{ background: s.iconBg }}
-                    >
-                      <Icon size={18} />
-                    </div>
+                  <div
+                    className={`h-12 w-12 rounded-lg flex items-center justify-center ${s.iconColor}`}
+                    style={{ background: s.iconBg }}
+                  >
+                    <Icon size={18} />
                   </div>
                 </div>
               </div>
@@ -199,30 +194,25 @@ export default function Reports() {
           })}
         </section>
 
-        <div className="bg-white border rounded-lg shadow-sm p-6 mb-8">
-          <h3 className="text-sm font-medium text-slate-700 mb-4 text-center">
+        {/* ------------ BAR CHART ------------ */}
+        <div className="bg-white border rounded-lg shadow-sm p-0 sm:p-6 mb-10">
+          <h3 className="text-sm font-medium text-slate-700 mb-4 text-center sm:text-left">
             Verification Status Breakdown
           </h3>
-          <div style={{ width: "100%", height: 280 }}>
+
+          <div className="h-[240px] sm:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={barDataForRange}
-                margin={{ top: 6, right: 10, left: 0, bottom: 6 }}
-                barCategoryGap="20%"
-              >
-                <defs>
-                  <linearGradient id="barGreen" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#00C853" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#00C853" stopOpacity={0.3} />
-                  </linearGradient>
-                </defs>
+              <BarChart data={barDataForRange}>
                 <CartesianGrid strokeDasharray="4 4" stroke="#F1F5F9" />
-                <XAxis dataKey="name" tick={{ fill: "#64748B", fontSize: 12 }} />
-                <YAxis tickFormatter={(v) => fmt(Number(v))} tick={{ fill: "#64748B" }} />
-                <Tooltip formatter={(v: any) => fmt(Number(v))} labelFormatter={(l) => `${l}`} />
-                <Bar dataKey="value" radius={[8, 8, 0, 0]} animationDuration={500}>
-                  {barDataForRange.map((_entry, index) => (
-                    <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fill: "#64748B", fontSize: 12 }}
+                />
+                <YAxis tickFormatter={(v) => fmt(v)} />
+                <Tooltip formatter={(v) => fmt(v)} />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                  {barDataForRange.map((_, i) => (
+                    <Cell key={i} fill={barColors[i % barColors.length]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -230,47 +220,61 @@ export default function Reports() {
           </div>
         </div>
 
-        <div className="bg-white border rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
+        {/* ------------ LINE CHART ------------ */}
+        <div className="bg-white border rounded-lg shadow-sm p-0 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
             <h3 className="text-sm font-medium text-slate-700">
               Verification Volume Over Time
             </h3>
-            <div>
-              <button className="px-3 py-1 text-xs border rounded-md border-[#EAECF0] text-[#344054] bg-white">
-                Export
-              </button>
-            </div>
+
+            <button className="px-3 py-1 text-xs border rounded-md">
+              Export
+            </button>
           </div>
-          <div style={{ width: "100%", height: 340 }}>
+
+          <div className="h-[280px] sm:h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={lineDataForRange} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="authGrad" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#00C853" stopOpacity={0.18} />
-                    <stop offset="100%" stopColor="#00C853" stopOpacity={0.02} />
-                  </linearGradient>
-                  <linearGradient id="suspGrad" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#FFB74D" stopOpacity={0.12} />
-                    <stop offset="100%" stopColor="#FFB74D" stopOpacity={0.02} />
-                  </linearGradient>
-                  <linearGradient id="forgGrad" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#FF6B6B" stopOpacity={0.12} />
-                    <stop offset="100%" stopColor="#FF6B6B" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
+              <ComposedChart data={lineDataForRange}>
                 <CartesianGrid strokeDasharray="4 4" stroke="#F1F5F9" />
-                <XAxis dataKey="month" tick={{ fill: "#64748B" }} />
-                <YAxis tickFormatter={(v) => fmt(Number(v))} tick={{ fill: "#64748B" }} />
-                <Tooltip formatter={(v: any) => fmt(Number(v))} labelFormatter={(l) => `${l}`} />
-                <Legend verticalAlign="top" align="right" />
+                <XAxis dataKey="month" />
+                <YAxis tickFormatter={(v) => fmt(v)} />
+                <Tooltip formatter={(v) => fmt(v)} />
+                <Legend />
 
-                <Area type="monotone" dataKey="authentic" stroke="transparent" fill="url(#authGrad)" />
-                <Area type="monotone" dataKey="suspicious" stroke="transparent" fill="url(#suspGrad)" />
-                <Area type="monotone" dataKey="forged" stroke="transparent" fill="url(#forgGrad)" />
+                {/* AREA background */}
+                <Area
+                  type="monotone"
+                  dataKey="authentic"
+                  stroke="transparent"
+                  fill="#00C85320"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="suspicious"
+                  stroke="transparent"
+                  fill="#FFB74D20"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="forged"
+                  stroke="transparent"
+                  fill="#FF6B6B20"
+                />
 
-                <Line type="monotone" dataKey="authentic" stroke="#00C853" dot={{ r: 3 }} activeDot={{ r: 5 }} strokeWidth={2} />
-                <Line type="monotone" dataKey="suspicious" stroke="#FFB74D" dot={{ r: 3 }} activeDot={{ r: 5 }} strokeWidth={2} />
-                <Line type="monotone" dataKey="forged" stroke="#FF6B6B" dot={{ r: 3 }} activeDot={{ r: 5 }} strokeWidth={2} />
+                {/* LINE foreground */}
+                <Line
+                  type="monotone"
+                  dataKey="authentic"
+                  stroke="#00C853"
+                  dot
+                />
+                <Line
+                  type="monotone"
+                  dataKey="suspicious"
+                  stroke="#FFB74D"
+                  dot
+                />
+                <Line type="monotone" dataKey="forged" stroke="#FF6B6B" dot />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
