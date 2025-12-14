@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import ImageArt from "../../assets/signup_img.png";
 import Creating from "./Creating";
+import { authAPI } from "../../api";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -12,11 +13,18 @@ const Signin = () => {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (authAPI.isAuthenticated()) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   const isComplete = !!email.trim() && !!password;
 
   const validateEmail = (v: string) => /\S+@\S+\.\S+/.test(v);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
@@ -29,13 +37,32 @@ const Signin = () => {
       return;
     }
 
-    // Simulate submit: show creating loader (replace with API call)
-    console.log("Signin payload:", { email });
     setSubmitting(true);
-    // Simulate server response then navigate to dashboard
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 700);
+
+    try {
+      const response = await authAPI.login({ email, password });
+
+      if (response.success) {
+        // Check if email is verified
+        if (!response.data.user.isEmailVerified) {
+          setErrorMessage("Please verify your email first.");
+          setSubmitting(false);
+          // Optionally navigate to verification page
+          navigate(
+            `/auth/verify?email=${encodeURIComponent(email)}&type=registration`
+          );
+          return;
+        }
+
+        // Navigate to dashboard on successful login
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      setErrorMessage(
+        error.message || "Login failed. Please check your credentials."
+      );
+      setSubmitting(false);
+    }
   };
 
   if (submitting) return <Creating />;

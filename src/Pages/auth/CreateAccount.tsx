@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ImageArt from "../../assets/signup_img.png";
 import { Eye, EyeOff } from "lucide-react";
 import Creating from "./Creating.tsx";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { authAPI } from "../../api";
+import type { UserRole } from "../../types";
 
 const CreateAccount = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +17,15 @@ const CreateAccount = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const role = searchParams.get("role") || "institution";
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (authAPI.isAuthenticated()) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   const isComplete =
     !!fullName.trim() &&
@@ -26,7 +36,7 @@ const CreateAccount = () => {
 
   const validateEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
@@ -55,12 +65,29 @@ const CreateAccount = () => {
       return;
     }
 
-    console.log("Create account payload:", {
-      fullName,
-      institutionName,
-      email,
-    });
     setSubmitting(true);
+
+    try {
+      const response = await authAPI.register({
+        email,
+        password,
+        fullName,
+        institutionName: role === "guest" ? undefined : institutionName,
+        role: role.toUpperCase() as UserRole,
+      });
+
+      if (response.success) {
+        // Navigate to verify email page
+        navigate(
+          `/auth/verify?email=${encodeURIComponent(email)}&type=registration`
+        );
+      }
+    } catch (error: any) {
+      setErrorMessage(
+        error.message || "Registration failed. Please try again."
+      );
+      setSubmitting(false);
+    }
   };
 
   if (submitting) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Image from "../../assets/signup_img.png";
 import {
@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { authAPI } from "../../api";
 
 const roles = [
   {
@@ -39,6 +40,13 @@ const roles = [
 const SignupNew = () => {
   const [selected, setSelected] = useState<string | null>("institution");
   const navigate = useNavigate();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (authAPI.isAuthenticated()) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex">

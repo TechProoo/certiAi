@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
+import { authAPI } from "../api";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const isAuthenticated = authAPI.isAuthenticated();
 
   const links = ["Home", "Features", "How it works", "Developers"];
 
@@ -43,10 +45,10 @@ const Navbar = () => {
               API Documentation
             </a>
             <Link
-              to="/signup"
+              to={isAuthenticated ? "/dashboard" : "/signup"}
               className="text-sm px-4 py-2 rounded-md bg-white text-purple-900"
             >
-              Get Started
+              {isAuthenticated ? "Dashboard" : "Get Started"}
             </Link>
           </div>
 
@@ -90,10 +92,10 @@ const Navbar = () => {
                   API Documentation
                 </a>
                 <Link
-                  to="/signup"
+                  to={isAuthenticated ? "/dashboard" : "/signup"}
                   className="block text-center px-4 py-2 rounded-md bg-white text-purple-900"
                 >
-                  Get Started
+                  {isAuthenticated ? "Dashboard" : "Get Started"}
                 </Link>
               </div>
             </div>

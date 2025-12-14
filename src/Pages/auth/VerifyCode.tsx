@@ -1,16 +1,21 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import ImageArt from "../../assets/signup_img.png";
+import { authAPI } from "../../api";
+import SuccessNotification from "../../Components/SuccessNotification";
 
 const CODE_LENGTH = 5;
 
 const VerifyCode: React.FC = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
+  const type = searchParams.get("type") || "registration"; // registration or reset
   const navigate = useNavigate();
 
   const [values, setValues] = useState<string[]>(Array(CODE_LENGTH).fill(""));
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
@@ -60,22 +65,49 @@ const VerifyCode: React.FC = () => {
   const code = values.join("");
   const isComplete = code.length === CODE_LENGTH;
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setError(null);
-    // Simulated verification: accept code '12345'
-    if (!isComplete) return setError("Please enter the 5-digit code.");
-    if (code !== "12345") {
-      setError("Wrong Code! Try Again");
+
+    if (!isComplete) {
+      setError("Please enter the 5-digit code.");
       return;
     }
 
-    // On success, navigate to reset password page
-    navigate(`/auth/reset-password?email=${encodeURIComponent(email)}`);
+    setLoading(true);
+
+    try {
+      if (type === "registration") {
+        // Verify email for registration
+        const response = await authAPI.verifyEmail({ code });
+
+        if (response.success) {
+          // Show success notification
+          setShowSuccess(true);
+
+          // Wait 2 seconds before redirecting to signin
+          setTimeout(() => {
+            navigate("/signin");
+          }, 2000);
+        }
+      } else {
+        // For password reset flow, just pass the code to reset password page
+        // The code will be verified when they submit the new password
+        navigate(
+          `/auth/reset-password?email=${encodeURIComponent(email)}&code=${code}`
+        );
+      }
+    } catch (error: any) {
+      setError(error.message || "Invalid or expired verification code.");
+      setLoading(false);
+      // Clear the code on error
+      setValues(Array(CODE_LENGTH).fill(""));
+      inputsRef.current[0]?.focus();
+    }
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       <div className="w-full max-w-6xl  grid grid-cols-12">
         <div className="col-span-5 h-screen sticky top-0 hidden md:block bg-neutral-900">
           <img
@@ -131,14 +163,14 @@ const VerifyCode: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={!isComplete}
+                    disabled={!isComplete || loading}
                     className={`w-full text-white py-3 rounded-md border shadow-sm transition-colors ${
-                      isComplete
-                        ? "bg-[#130D3A] border-[#130D3A]"
-                        : "bg-[#130D3AB2] border-[#130D3A] text-gray-500"
+                      isComplete && !loading
+                        ? "bg-[#130D3A] border-[#130D3A] hover:bg-[#0f0b2e]"
+                        : "bg-[#130D3AB2] border-[#130D3A] text-gray-500 cursor-not-allowed"
                     }`}
                   >
-                    Reset Password
+                    {loading ? "Verifying..." : "Verify Code"}
                   </button>
                 </div>
 
@@ -152,6 +184,14 @@ const VerifyCode: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Notification */}
+      {showSuccess && (
+        <SuccessNotification
+          message="Registration successful! Redirecting to sign in..."
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
     </div>
   );
 };

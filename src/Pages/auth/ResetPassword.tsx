@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ImageArt from "../../assets/signup_img.png";
 import { Eye, EyeOff } from "lucide-react";
+import { authAPI } from "../../api";
 
 const ResetPassword: React.FC = () => {
-  //   const [searchParams] = useSearchParams();
-  //   const email = searchParams.get("email") || "";
+  const [searchParams] = useSearchParams();
+  const code = searchParams.get("code") || "";
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
@@ -13,12 +14,14 @@ const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const isComplete = password.length >= 8 && confirmPassword.length >= 8;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
     if (password.length < 8) {
       setError("Password must be at least 8 characters.");
       return;
@@ -28,9 +31,21 @@ const ResetPassword: React.FC = () => {
       return;
     }
 
-    // TODO: call API to update the password for `email`.
-    // For now navigate to the success page.
-    navigate("/auth/reset-success");
+    setLoading(true);
+
+    try {
+      const response = await authAPI.resetPassword({
+        code,
+        newPassword: password,
+      });
+
+      if (response.success) {
+        navigate("/auth/reset-success");
+      }
+    } catch (error: any) {
+      setError(error.message || "Failed to reset password. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,14 +130,14 @@ const ResetPassword: React.FC = () => {
                   <div>
                     <button
                       type="submit"
-                      disabled={!isComplete}
+                      disabled={!isComplete || loading}
                       className={`w-full text-white py-3 rounded-md border shadow-sm transition-colors ${
-                        isComplete
+                        isComplete && !loading
                           ? "bg-[#130D3A] border-[#130D3A] hover:bg-[#0f0b2e]"
                           : "bg-[#130D3AB2] border-[#130D3A] text-gray-500 cursor-not-allowed"
                       }`}
                     >
-                      Reset Password
+                      {loading ? "Resetting..." : "Reset Password"}
                     </button>
                   </div>
 

@@ -1,18 +1,27 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import ImageArt from "../../assets/signup_img.png";
+import { authAPI } from "../../api";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (authAPI.isAuthenticated()) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   const isComplete = !!email.trim();
 
   const validateEmail = (v: string) => /\S+@\S+\.\S+/.test(v);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
@@ -20,8 +29,21 @@ const ForgotPassword = () => {
       setErrorMessage("Please enter a valid email address.");
       return;
     }
-    // Navigate to verification code entry page with the email as a query param
-    navigate(`/auth/verify?email=${encodeURIComponent(email)}`);
+
+    setLoading(true);
+
+    try {
+      const response = await authAPI.forgotPassword({ email });
+
+      if (response.success) {
+        // Navigate to verification code entry page with the email as a query param
+        navigate(`/auth/verify?email=${encodeURIComponent(email)}&type=reset`);
+      }
+    } catch (error: any) {
+      // Don't show specific error to prevent email enumeration
+      // Still navigate to verify page for security
+      navigate(`/auth/verify?email=${encodeURIComponent(email)}&type=reset`);
+    }
   };
 
   return (
@@ -66,14 +88,14 @@ const ForgotPassword = () => {
                   <div>
                     <button
                       type="submit"
-                      disabled={!isComplete}
+                      disabled={!isComplete || loading}
                       className={`w-full cursor-pointer text-white py-3 border shadow-sm transition-colors rounded-tr-[10px] rounded-br-[10px] rounded-bl-[10px] ${
-                        isComplete
+                        isComplete && !loading
                           ? "bg-[#130D3A] border-[#130D3A] hover:bg-[#0f0b2e]"
                           : "bg-[#130D3AB2] border-[#130D3A] text-gray-500 cursor-not-allowed"
                       }`}
                     >
-                      Reset Password
+                      {loading ? "Sending..." : "Reset Password"}
                     </button>
                   </div>
 

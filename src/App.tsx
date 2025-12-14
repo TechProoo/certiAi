@@ -16,6 +16,7 @@ import VerificationResult from "./Pages/dashboard/VerificationResult";
 import Upload from "./Pages/dashboard/Upload";
 import VerificationHistory from "./Pages/dashboard/History";
 import Reports from "./Pages/dashboard/Reports";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -60,17 +61,48 @@ function App() {
             element={<ResetPassword />}
           ></Route>
           <Route path="/auth/reset-success" element={<ResetSuccess />}></Route>
-          <Route path="/dashboard" element={<Dashboard />}></Route>
+
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          ></Route>
           <Route
             path="/dashboard/verification/:id"
-            element={<VerificationResult />}
+            element={
+              <ProtectedRoute>
+                <VerificationResult />
+              </ProtectedRoute>
+            }
           ></Route>
           <Route
             path="/dashboard/history"
-            element={<VerificationHistory />}
+            element={
+              <ProtectedRoute>
+                <VerificationHistory />
+              </ProtectedRoute>
+            }
           ></Route>
-          <Route path="/dashboard/reports" element={<Reports />}></Route>
-          <Route path="/dashboard/upload" element={<Upload />}></Route>
+          <Route
+            path="/dashboard/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="/dashboard/upload"
+            element={
+              <ProtectedRoute>
+                <Upload />
+              </ProtectedRoute>
+            }
+          ></Route>
         </Routes>
       </motion.div>
     </>
