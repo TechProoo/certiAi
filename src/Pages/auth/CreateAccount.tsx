@@ -10,7 +10,6 @@ const CreateAccount = () => {
   const [fullName, setFullName] = useState("");
   const [institutionName, setInstitutionName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -20,7 +19,7 @@ const CreateAccount = () => {
 
   const isComplete =
     !!fullName.trim() &&
-    !!institutionName.trim() &&
+    (role === "guest" || !!institutionName.trim()) &&
     !!email.trim() &&
     !!password &&
     !!confirmPassword;
@@ -35,8 +34,12 @@ const CreateAccount = () => {
       setErrorMessage("Please enter your full name.");
       return;
     }
-    if (!institutionName.trim()) {
-      setErrorMessage("Please enter your institution name.");
+    if (role !== "guest" && !institutionName.trim()) {
+      setErrorMessage(
+        role === "employer"
+          ? "Please enter your company/agency name."
+          : "Please enter your institution name."
+      );
       return;
     }
     if (!validateEmail(email)) {
@@ -56,7 +59,6 @@ const CreateAccount = () => {
       fullName,
       institutionName,
       email,
-      phone,
     });
     setSubmitting(true);
   };
@@ -66,9 +68,9 @@ const CreateAccount = () => {
   }
 
   return (
-    <div className="min-h-screen ">
-      <div className="w-full max-w-6xl  grid grid-cols-12">
-        <div className="col-span-5 sticky top-0 hidden md:block bg-neutral-900">
+    <div className="min-h-screen flex ">
+      <div className="w-full max-w-6xl grid md:grid-cols-12 grid-cols-1 ">
+        <div className="col-span-5 sticky top-0 hidden md:block ">
           <img
             src={ImageArt}
             alt="art"
@@ -93,11 +95,7 @@ const CreateAccount = () => {
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-xs text-[#344054] mb-2">
-                    {role === "employer"
-                      ? "Contact Person"
-                      : role === "guest"
-                      ? "Guest Name"
-                      : "Full Name"}
+                    {role === "employer" ? "Contact Person" : "Full Name"}
                   </label>
                   <input
                     value={fullName}
@@ -107,29 +105,31 @@ const CreateAccount = () => {
                       role === "employer"
                         ? "Contact person name"
                         : role === "guest"
-                        ? "Guest name"
+                        ? "Full name"
                         : "First name"
                     }
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs text-gray-600 mb-2">
-                    {role === "employer"
-                      ? "Company / Agency Name"
-                      : "Institution Name"}
-                  </label>
-                  <input
-                    value={institutionName}
-                    onChange={(e) => setInstitutionName(e.target.value)}
-                    className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white placeholder-gray-300"
-                    placeholder={
-                      role === "employer"
-                        ? "Company or agency name"
-                        : "Institution name"
-                    }
-                  />
-                </div>
+                {role !== "guest" && (
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-2">
+                      {role === "employer"
+                        ? "Company / Agency Name"
+                        : "Institution Name"}
+                    </label>
+                    <input
+                      value={institutionName}
+                      onChange={(e) => setInstitutionName(e.target.value)}
+                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white placeholder-gray-300"
+                      placeholder={
+                        role === "employer"
+                          ? "Company or agency name"
+                          : "Institution name"
+                      }
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">
@@ -142,20 +142,6 @@ const CreateAccount = () => {
                     placeholder="Enter Email"
                   />
                 </div>
-
-                {role === "employer" && (
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-2">
-                      Phone
-                    </label>
-                    <input
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white placeholder-gray-300"
-                      placeholder="Phone number"
-                    />
-                  </div>
-                )}
 
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">
