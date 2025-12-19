@@ -2,8 +2,9 @@
 
 import DashboardLayout from "../../Components/dashboard/DashboardLayout";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { verificationAPI } from "../../api";
 import Waec from "../../assets/waec.png";
 import Neco from "../../assets/neco.png";
 import Jupeb from "../../assets/jupeb.png";
@@ -23,26 +24,28 @@ const certIcons: Record<string, string> = {
 export default function Upload() {
   const [selectedType, setSelectedType] = useState<string>(certTypes[0]);
   const navigate = useNavigate();
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [uploadedId, setUploadedId] = useState<string | null>(null);
 
   type FileItem = { id: string; file: File; preview: string | null };
   const [files, setFiles] = useState<FileItem[]>([]);
 
-  // helper to read file as data URL for transferring to verification page
-  const readFileAsDataUrl = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
   const addFiles = useCallback((incoming: FileList | null) => {
     if (!incoming) return;
-    const list = Array.from(incoming).map((f) => ({
+    // Only allow one file at a time
+    const file = incoming[0];
+    if (!file) return;
+
+    const fileItem = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-      file: f,
-      preview: f.type.startsWith("image/") ? URL.createObjectURL(f) : null,
-    }));
-    setFiles((prev) => [...prev, ...list]);
+      file,
+      preview: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
+    };
+    setFiles([fileItem]);
+    setError(null);
   }, []);
 
   useEffect(() => {
@@ -193,42 +196,61 @@ export default function Upload() {
           </div>
         </div>
         {/* Submit button */}
-        <div className="flex justify-end mt-6">
+        <div className="flex flex-col items-end mt-6 gap-3">
+          {error && (
+            <div className="w-full bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+
+          {uploadedId && (
+            <div className="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-md text-sm flex items-center gap-2">
+              <CheckCircle2 size={16} />
+              <span>
+                Certificate uploaded successfully! Processing verification...
+              </span>
+            </div>
+          )}
+
           <button
-            disabled={files.length === 0}
+            disabled={files.length === 0 || uploading}
             onClick={async () => {
               if (files.length === 0) return;
 
-              // Prepare serialized files (data URLs) so verification page can render them
-              const serialized = await Promise.all(
-                files.map(async (f) => ({
-                  id: f.id,
-                  name: f.file.name,
-                  size: f.file.size,
-                  type: f.file.type,
-                  dataUrl: await readFileAsDataUrl(f.file),
-                }))
-              );
-
-              const pageId = files[0]?.id ?? `${Date.now()}`;
               try {
-                sessionStorage.setItem(
-                  `verification-${pageId}`,
-                  JSON.stringify(serialized)
-                );
-              } catch (e) {
-                // ignore sessionStorage errors
-              }
+                setUploading(true);
+                setError(null);
 
-              navigate(`/dashboard/verification/${pageId}`, {
-                state: { files: serialized },
-              });
+                const file = files[0].file;
+                const response = await verificationAPI.uploadCertificate(
+                  file,
+                  selectedType
+                );
+
+                if (response.success && response.data) {
+                  setUploadedId(response.data.id);
+
+                  // Navigate to verification result page after 2 seconds
+                  setTimeout(() => {
+                    navigate(`/dashboard/verification/${response.data.id}`);
+                  }, 2000);
+                }
+              } catch (err: any) {
+                console.error("Upload failed:", err);
+                setError(
+                  err.message ||
+                    "Failed to upload certificate. Please try again."
+                );
+                setUploading(false);
+              }
             }}
-            className={`px-4 py-2 rounded-md text-white ${
-              files.length === 0 ? "bg-slate-300" : "bg-slate-900"
+            className={`px-6 py-3 rounded-md text-white transition ${
+              files.length === 0 || uploading
+                ? "bg-slate-300 cursor-not-allowed"
+                : "bg-slate-900 hover:bg-slate-800"
             }`}
           >
-            Submit for Verification
+            {uploading ? "Uploading..." : "Submit for Verification"}
           </button>
         </div>
       </div>

@@ -9,6 +9,7 @@ import {
   Clock,
   ChartNoAxesColumn,
 } from "lucide-react";
+import { authAPI } from "../../api";
 
 const items = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -19,6 +20,7 @@ const items = [
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const currentUser = authAPI.getCurrentUser();
 
   return (
     <aside
@@ -95,8 +97,12 @@ export default function Sidebar() {
 
           {!collapsed && (
             <div className="text-sm">
-              <div className="font-medium">John Doe</div>
-              <div className="text-xs text-slate-400">john@example.com</div>
+              <div className="font-medium">
+                {currentUser?.fullName || "User"}
+              </div>
+              <div className="text-xs text-slate-400">
+                {currentUser?.email || ""}
+              </div>
             </div>
           )}
         </div>

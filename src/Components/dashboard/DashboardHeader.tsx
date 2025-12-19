@@ -1,4 +1,4 @@
-import { AppWindow, CircleUserRound, LogOut, Search } from "lucide-react";
+import { AppWindow, LogOut, Search } from "lucide-react";
 import Image from "../../assets/889df31f76ad06a56f5f6753c0d142651be87951.jpg";
 import {
   DropdownMenu,
@@ -6,8 +6,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { authAPI } from "../../api";
 
 export default function DashboardHeader() {
+  const currentUser = authAPI.getCurrentUser();
+  const firstName = currentUser?.fullName?.split(" ")[0] || "User";
+
   return (
     <header className="w-full border-b px-4 md:px-8 py-2 bg-[#F8FAFC] flex items-center justify-between">
       {/* Left Section */}
@@ -38,7 +42,7 @@ export default function DashboardHeader() {
       <div className="flex items-center gap-3">
         {/* Hide username text on small screens */}
         <span className="text-sm text-gray-600 hidden md:block">
-          Hello Jayden
+          Hello {firstName}
         </span>
 
         <DropdownMenu>
@@ -67,23 +71,28 @@ export default function DashboardHeader() {
                 />
                 <div className="flex flex-col">
                   <span className="font-medium text-slate-900">
-                    Olaoluwa Emmanuel
+                    {currentUser?.fullName || "User"}
                   </span>
-                  <span className="text-xs text-slate-500">ola@gmail.com</span>
+                  <span className="text-xs text-slate-500">
+                    {currentUser?.email || ""}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="my-1 border-t border-[#EAECF0]" />
 
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <div className="flex items-center gap-2">
                 <CircleUserRound size={16} />
                 <span>View profile</span>
               </div>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
 
-            <DropdownMenuItem className="text-rose-600">
+            <DropdownMenuItem
+              className="text-rose-600"
+              onSelect={() => authAPI.logout()}
+            >
               <div className="flex items-center gap-2">
                 <LogOut size={16} />
                 <span>Log out</span>
