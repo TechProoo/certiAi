@@ -1,10 +1,8 @@
-﻿"use client";
-
-import DashboardLayout from "../../Components/dashboard/DashboardLayout";
+﻿import DashboardLayout from "../../Components/dashboard/DashboardLayout";
 import { useState, useEffect } from "react";
 import { authAPI, verificationAPI } from "../../api";
 import type { DashboardStats } from "../../api/verification.api";
-// Using native inputs/buttons here; remove unused UI imports
+
 import {
   ShieldCheck,
   CheckCircle,
@@ -88,6 +86,12 @@ export default function Dashboard() {
               Here's what's happening with your certificate verifications today.
             </p>
           </header>
+
+          {error && (
+            <div className="mb-4 rounded-md bg-rose-50 border border-rose-100 p-3 text-rose-700 text-sm">
+              {error}
+            </div>
+          )}
 
           {/* STATS */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">

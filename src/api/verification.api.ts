@@ -58,6 +58,7 @@ class VerificationAPI {
         },
       }
     );
+    console.log(response)
     return response.data;
   }
 

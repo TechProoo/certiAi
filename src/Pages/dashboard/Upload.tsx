@@ -57,12 +57,58 @@ export default function Upload() {
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto ">
-        <h2 className="text-xl font-semibold mb-2 text-slate-900">
-          Upload Certificate
-        </h2>
-        <p className="text-sm text-slate-500 mb-6">
-          Select a certificate type and upload to verify its authenticity
-        </p>
+        <div className="flex justify-between items-center ">
+          <div>
+            <h2 className="text-xl font-semibold mb-2 text-slate-900">
+              Upload Certificate
+            </h2>
+            <p className="text-sm text-slate-500 mb-6">
+              Select a certificate type and upload to verify its authenticity
+            </p>
+          </div>
+          <div>
+            <button
+              disabled={files.length === 0 || uploading}
+              onClick={async () => {
+                if (files.length === 0) return;
+
+                try {
+                  setUploading(true);
+                  setError(null);
+
+                  const file = files[0].file;
+                  const response = await verificationAPI.uploadCertificate(
+                    file,
+                    selectedType
+                  );
+
+                  if (response.success && response.data) {
+                    setUploadedId(response.data.id);
+
+                    // Navigate to verification result page after 2 seconds
+                    setTimeout(() => {
+                      navigate(`/dashboard/verification/${response.data.id}`);
+                    }, 2000);
+                  }
+                } catch (err: any) {
+                  console.error("Upload failed:", err);
+                  setError(
+                    err.message ||
+                      "Failed to upload certificate. Please try again."
+                  );
+                  setUploading(false);
+                }
+              }}
+              className={`px-6 py-3 rounded-md text-white transition ${
+                files.length === 0 || uploading
+                  ? "bg-slate-300 cursor-not-allowed"
+                  : "bg-slate-900 hover:bg-slate-800"
+              }`}
+            >
+              {uploading ? "Uploading..." : "Submit for Verification"}
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left: types */}
@@ -147,51 +193,109 @@ export default function Upload() {
                 </div>
               )}
 
-              {files.map((f) => (
-                <div
-                  key={f.id}
-                  className="relative h-28 w-full rounded-md border border-dashed border-[#E6E7EA] flex items-center p-3"
-                >
-                  <button
-                    aria-label="remove"
-                    onClick={() => {
-                      setFiles((prev) => {
-                        prev.forEach(
-                          (p) =>
-                            p.id === f.id &&
-                            p.preview &&
-                            URL.revokeObjectURL(p.preview)
-                        );
-                        return prev.filter((p) => p.id !== f.id);
-                      });
-                    }}
-                    className="absolute right-2 top-2 text-slate-400 hover:text-rose-600"
-                  >
-                    ✕
-                  </button>
+              {files.map((f) => {
+                const isImage = f.file.type.startsWith("image/");
+                const isPDF = f.file.type === "application/pdf";
 
-                  <div className="h-20 w-20 rounded-md bg-slate-50 flex items-center justify-center overflow-hidden">
-                    {f.preview ? (
-                      <img
-                        src={f.preview}
-                        alt={f.file.name}
-                        className="h-full object-contain"
-                      />
+                return (
+                  <div
+                    key={f.id}
+                    className="relative w-full rounded-lg border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                  >
+                    <button
+                      aria-label="remove"
+                      onClick={() => {
+                        setFiles((prev) => {
+                          prev.forEach(
+                            (p) =>
+                              p.id === f.id &&
+                              p.preview &&
+                              URL.revokeObjectURL(p.preview)
+                          );
+                          return prev.filter((p) => p.id !== f.id);
+                        });
+                      }}
+                      className="absolute right-2 top-2 z-10 h-6 w-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:border-rose-600 transition-colors"
+                    >
+                      ✕
+                    </button>
+
+                    {isImage && f.preview ? (
+                      // Image preview
+                      <div className="p-3">
+                        <div className="h-24 w-full rounded-md bg-slate-50 flex items-center justify-center overflow-hidden">
+                          <img
+                            src={f.preview}
+                            alt={f.file.name}
+                            className="h-full w-full object-contain"
+                          />
+                        </div>
+                        <div className="mt-2">
+                          <div className="text-sm font-medium text-slate-800 truncate">
+                            {f.file.name}
+                          </div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            {Math.round(f.file.size / 1024)} KB
+                          </div>
+                        </div>
+                      </div>
                     ) : (
-                      <div className="text-slate-400">{f.file.name}</div>
+                      // PDF or non-image file display
+                      <div className="p-4 flex items-center gap-4">
+                        <div className="shrink-0 h-16 w-16 rounded-lg bg-linear-to-br from-red-50 to-red-100 flex items-center justify-center">
+                          {isPDF ? (
+                            <svg
+                              className="h-8 w-8 text-red-600"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                              <path d="M14 2v6h6M9.5 13h1v3.5h-1V13zm2.5 0h1.5c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5H12v1h-1V13h1.5zm0 2h1.5c.276 0 .5-.224.5-.5s-.224-.5-.5-.5H12v1z" />
+                              <text
+                                x="7"
+                                y="19"
+                                fontSize="4"
+                                fill="currentColor"
+                                fontWeight="bold"
+                              >
+                                PDF
+                              </text>
+                            </svg>
+                          ) : (
+                            <svg
+                              className="h-8 w-8 text-slate-600"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                              <path d="M14 2v6h6" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-slate-800 truncate">
+                            {f.file.name}
+                          </div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            {isPDF ? "PDF Document" : f.file.type || "Document"}{" "}
+                            • {Math.round(f.file.size / 1024)} KB
+                          </div>
+                          <div className="mt-2">
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-full w-full bg-linear-to-r from-blue-500 to-blue-600 rounded-full"></div>
+                              </div>
+                              <span className="text-xs text-green-600 font-medium">
+                                Ready
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
-
-                  <div className="ml-3 truncate">
-                    <div className="text-sm font-medium text-slate-800 truncate">
-                      {f.file.name}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      {Math.round(f.file.size / 1024)} KB
-                    </div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -211,47 +315,6 @@ export default function Upload() {
               </span>
             </div>
           )}
-
-          <button
-            disabled={files.length === 0 || uploading}
-            onClick={async () => {
-              if (files.length === 0) return;
-
-              try {
-                setUploading(true);
-                setError(null);
-
-                const file = files[0].file;
-                const response = await verificationAPI.uploadCertificate(
-                  file,
-                  selectedType
-                );
-
-                if (response.success && response.data) {
-                  setUploadedId(response.data.id);
-
-                  // Navigate to verification result page after 2 seconds
-                  setTimeout(() => {
-                    navigate(`/dashboard/verification/${response.data.id}`);
-                  }, 2000);
-                }
-              } catch (err: any) {
-                console.error("Upload failed:", err);
-                setError(
-                  err.message ||
-                    "Failed to upload certificate. Please try again."
-                );
-                setUploading(false);
-              }
-            }}
-            className={`px-6 py-3 rounded-md text-white transition ${
-              files.length === 0 || uploading
-                ? "bg-slate-300 cursor-not-allowed"
-                : "bg-slate-900 hover:bg-slate-800"
-            }`}
-          >
-            {uploading ? "Uploading..." : "Submit for Verification"}
-          </button>
         </div>
       </div>
     </DashboardLayout>

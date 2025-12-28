@@ -32,6 +32,7 @@ const Signin = () => {
       setErrorMessage("Please enter a valid email address.");
       return;
     }
+
     if (password.length < 8) {
       setErrorMessage("Password must be at least 8 characters.");
       return;
@@ -42,30 +43,38 @@ const Signin = () => {
     try {
       const response = await authAPI.login({ email, password });
 
-      if (response.success) {
-        // Check if email is verified
-        if (!response.data.user.isEmailVerified) {
-          setErrorMessage("Please verify your email first.");
-          setSubmitting(false);
-          // Optionally navigate to verification page
-          navigate(
-            `/auth/verify?email=${encodeURIComponent(email)}&type=registration`
-          );
-          return;
-        }
-
-        // Navigate to dashboard on successful login
-        navigate("/dashboard");
+      if (!response.success) {
+        throw new Error("Login failed");
       }
-    } catch (error: any) {
-      setErrorMessage(
-        error.message || "Login failed. Please check your credentials."
-      );
+
+      if (!response.data.user.isEmailVerified) {
+        setSubmitting(false);
+        navigate(
+          `/auth/verify?email=${encodeURIComponent(email)}&type=registration`
+        );
+        return;
+      }
+
       setSubmitting(false);
+      navigate("/dashboard");
+    } catch (error: any) {
+      setSubmitting(false);
+
+      if (error.response?.status === 401) {
+        setErrorMessage(
+          "Invalid credentials. Please check your email and password."
+        );
+      } else {
+        setErrorMessage(error.message || "Login failed. Please try again.");
+      }
     }
   };
 
-  if (submitting) return <Creating />;
+  // Only show Creating component when submitting AND no error message
+  // This prevents the Creating screen from showing after an error
+  if (submitting && !errorMessage) {
+    return <Creating />;
+  }
 
   return (
     <div>
@@ -144,20 +153,18 @@ const Signin = () => {
                   <div>
                     <button
                       type="submit"
-                      disabled={!isComplete}
-                      className={`w-full cursor-pointer text-white py-3 border shadow-sm transition-colors rounded-tr-[10px] rounded-br-[10px] rounded-bl-[10px] ${
-                        isComplete
-                          ? "bg-[#130D3A] border-[#130D3A] hover:bg-[#0f0b2e]"
-                          : "bg-[#130D3AB2] border-[#130D3A] text-gray-500 cursor-not-allowed"
-                      }`}
+                      disabled={!isComplete || submitting}
+                      className="w-full py-3 rounded-md bg-[#130D3A] text-white"
                     >
-                      Sign in
+                      {submitting ? "Signing in..." : "Sign in"}
                     </button>
                   </div>
 
                   {errorMessage && (
-                    <div className="mt-4 text-sm text-red-600">
-                      {errorMessage}
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                      <p className="text-sm text-red-600 font-medium">
+                        {errorMessage}
+                      </p>
                     </div>
                   )}
 

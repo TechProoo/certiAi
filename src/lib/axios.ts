@@ -35,14 +35,20 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 Unauthorized
+    // Handle 401 Unauthorized - but only redirect if NOT already on signin page
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Clear tokens and redirect to login
-      Cookies.remove("accessToken");
-      Cookies.remove("user");
-      window.location.href = "/signin";
+      // Only redirect if this is an authenticated request failure (token expired)
+      // Don't redirect if it's a login attempt failure (wrong credentials)
+      const isLoginAttempt = originalRequest.url?.includes("/auth/login");
+
+      if (!isLoginAttempt) {
+        // Clear tokens and redirect to login
+        Cookies.remove("accessToken");
+        Cookies.remove("user");
+        window.location.href = "/signin";
+      }
 
       return Promise.reject(error);
     }
@@ -61,6 +67,7 @@ axiosInstance.interceptors.response.use(
       status: error.response?.status,
       message: errorMessage,
       data: error.response?.data,
+      response: error.response, // Include response for status code checking
     });
   }
 );
