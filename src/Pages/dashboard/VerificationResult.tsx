@@ -230,7 +230,7 @@ export default function VerificationResult() {
                             verification.fileMimeType.startsWith("image/");
                           const isPDF =
                             verification.fileMimeType === "application/pdf";
-                          const imageUrl = `http://localhost:3000/${verification.fileUrl
+                          const imageUrl = `${import.meta.env.VITE_API_URL.replace('/api', '')}/${verification.fileUrl
                             .split("\\")
                             .join("/")}`;
 
