@@ -17,6 +17,35 @@ type SerializedFile = {
 };
 
 export default function VerificationResult() {
+  // Download verification report as JSON
+  const handleDownloadReport = () => {
+    if (!verification) return;
+    const report = {
+      id: verification.id,
+      fileName: verification.fileName,
+      certificateType: verification.certificateType,
+      status: verification.status,
+      confidenceScore: verification.confidenceScore,
+      analysisResult: verification.analysisResult,
+      createdAt: verification.createdAt,
+      processedAt: verification.updatedAt,
+      processingTime: verification.processingTime,
+      fileSize: verification.fileSize,
+      fileMimeType: verification.fileMimeType,
+      errorMessage: verification.errorMessage,
+    };
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `verification-report-${verification.id}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
   const params = useParams();
   const id = params.id ?? "CERT-XXXX";
   const location = useLocation();
@@ -134,12 +163,18 @@ export default function VerificationResult() {
                 aria-label="Download verification report"
                 title="Download verification report"
                 className="md:hidden p-2 rounded-md bg-slate-900 text-white hover:bg-slate-800 transition"
+                onClick={handleDownloadReport}
+                disabled={!verification}
               >
                 <Download size={16} />
               </button>
 
               {/* full button on md+ */}
-              <button className="hidden md:inline-flex bg-slate-900 text-white px-4 py-2 rounded-md text-sm items-center gap-2 hover:bg-slate-800 transition">
+              <button
+                className="hidden md:inline-flex bg-slate-900 text-white px-4 py-2 rounded-md text-sm items-center gap-2 hover:bg-slate-800 transition"
+                onClick={handleDownloadReport}
+                disabled={!verification}
+              >
                 <Download size={14} />
                 <span>Download Verification Report</span>
               </button>
@@ -230,9 +265,10 @@ export default function VerificationResult() {
                             verification.fileMimeType.startsWith("image/");
                           const isPDF =
                             verification.fileMimeType === "application/pdf";
-                          const imageUrl = `${import.meta.env.VITE_API_URL.replace('/api', '')}/${verification.fileUrl
-                            .split("\\")
-                            .join("/")}`;
+                          const imageUrl = `${import.meta.env.VITE_API_URL.replace(
+                            "/api",
+                            ""
+                          )}/${verification.fileUrl.split("\\").join("/")}`;
 
                           return (
                             <div className="w-full rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -416,8 +452,36 @@ export default function VerificationResult() {
                       verification.status !== "PROCESSING" &&
                       verification.analysisResult && (
                         <div className="bg-white rounded-lg shadow-sm border p-6">
-                          <h5 className="font-medium mb-4">Analysis</h5>
+                          <h5 className="font-medium mb-4 text-black">Analysis</h5>
                           <div className="flex flex-wrap gap-3">
+                            {/* Display critical OCR anomalies if present */}
+                            {verification.analysisResult?.ocr_analysis
+                              ?.anomalies && (
+                              <>
+                                {verification.analysisResult.ocr_analysis.anomalies.map(
+                                  (anomaly: string, idx: number) => {
+                                    if (
+                                      anomaly.includes(
+                                        "CRITICAL: No valid grades found"
+                                      ) ||
+                                      anomaly.includes(
+                                        "No grade patterns detected in certificate text"
+                                      )
+                                    ) {
+                                      return (
+                                        <span
+                                          key={idx}
+                                          className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full border border-red-300"
+                                        >
+                                          {anomaly}
+                                        </span>
+                                      );
+                                    }
+                                    return null;
+                                  }
+                                )}
+                              </>
+                            )}
                             {verification.analysisResult.details
                               ?.textRecognition && (
                               <span

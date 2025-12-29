@@ -2,6 +2,7 @@
 
 import DashboardLayout from "../../Components/dashboard/DashboardLayout";
 import { useState, useCallback, useEffect, useRef } from "react";
+import { X } from "lucide-react";
 import { UploadCloud, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { verificationAPI } from "../../api";
@@ -21,8 +22,9 @@ const certIcons: Record<string, string> = {
   ICAN: Ican,
 };
 
-export default function Upload() {
+const Upload = () => {
   const [selectedType, setSelectedType] = useState<string>(certTypes[0]);
+  const [showComingSoon, setShowComingSoon] = useState(false);
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -117,7 +119,13 @@ export default function Upload() {
               {certTypes.map((t) => (
                 <button
                   key={t}
-                  onClick={() => setSelectedType(t)}
+                  onClick={() => {
+                    if (t !== "WASSCE") {
+                      setShowComingSoon(true);
+                    } else {
+                      setSelectedType(t);
+                    }
+                  }}
                   className={`w-full text-left px-4 py-3 rounded-md flex items-center justify-between border ${
                     selectedType === t
                       ? "bg-white shadow-md border-slate-200"
@@ -316,7 +324,38 @@ export default function Upload() {
             </div>
           )}
         </div>
+      {/* Coming Soon Modal */}
+      {showComingSoon && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center relative animate-fade-in">
+            <button
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
+              onClick={() => setShowComingSoon(false)}
+              aria-label="Close"
+            >
+              <X size={24} />
+            </button>
+            <div className="flex flex-col items-center gap-4">
+              <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-4 mb-2">
+                <UploadCloud size={48} className="text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Coming Soon!</h2>
+              <p className="text-base text-slate-600 mb-4">
+                This certificate type will be available soon.<br />
+                We’re working hard to bring you more verification options.
+              </p>
+              <div className="mt-2">
+                <span className="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-semibold text-sm">
+                  Stay tuned for updates!
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </DashboardLayout>
   );
-}
+};
+
+export default Upload;
