@@ -1,12 +1,6 @@
 import DashboardLayout from "../../Components/dashboard/DashboardLayout";
 import { useEffect, useState } from "react";
-import {
-  MoreHorizontal,
-  ArrowLeft,
-  ArrowRight,
-  FileQuestion,
-  UploadCloud,
-} from "lucide-react";
+import { MoreHorizontal, FileQuestion, UploadCloud } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { verificationAPI } from "../../api";
 import type { VerificationData } from "../../api/verification.api";
@@ -21,8 +15,8 @@ import Loader from "../../Components/Loader";
 export default function VerificationHistory() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // const [deleteOpen, setDeleteOpen] = useState(false);
+  // const [selectedId, setSelectedId] = useState<string | null>(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [verifications, setVerifications] = useState<VerificationData[]>([]);
@@ -50,21 +44,21 @@ export default function VerificationHistory() {
     fetchHistory();
   }, [page]);
 
-  const handleDelete = async (id: string) => {
-    try {
-      await verificationAPI.deleteVerification(id);
-      // Refresh the list
-      const response = await verificationAPI.getHistory(page, pageSize);
-      if (response.success) {
-        setVerifications(response.data.verifications);
-        setTotalCount(response.data.pagination.total);
-      }
-      setDeleteOpen(false);
-      setSelectedId(null);
-    } catch (error) {
-      console.error("Failed to delete verification:", error);
-    }
-  };
+  // const handleDelete = async (id: string) => {
+  //   try {
+  //     await verificationAPI.deleteVerification(id);
+  //     // Refresh the list
+  //     const response = await verificationAPI.getHistory(page, pageSize);
+  //     if (response.success) {
+  //       setVerifications(response.data.verifications);
+  //       setTotalCount(response.data.pagination.total);
+  //     }
+  //     setDeleteOpen(false);
+  //     setSelectedId(null);
+  //   } catch (error) {
+  //     console.error("Failed to delete verification:", error);
+  //   }
+  // };
 
   const filtered = verifications.filter(
     (r) =>
@@ -212,6 +206,7 @@ export default function VerificationHistory() {
                                 <DropdownMenuItem>
                                   Download Analysis
                                 </DropdownMenuItem>
+                                {/*
                                 <DropdownMenuItem
                                   className="text-rose-600"
                                   onSelect={() => {
@@ -221,6 +216,7 @@ export default function VerificationHistory() {
                                 >
                                   Delete
                                 </DropdownMenuItem>
+                                */}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </td>
@@ -228,213 +224,12 @@ export default function VerificationHistory() {
                       ))}
                     </tbody>
                   </table>
-
-                  {/* Mobile View (Cards) */}
-                  <div className="md:hidden space-y-4 p-4">
-                    {currentPage.map((row) => (
-                      <div
-                        key={row.id}
-                        className="border border-[#EAECF0] rounded-xl p-4 shadow-sm"
-                      >
-                        <div className="flex justify-between items-center text-xs text-slate-500">
-                          <span>
-                            {new Date(row.createdAt).toLocaleDateString()}
-                          </span>
-                          <span
-                            className={`px-2 py-1 rounded-full text-[10px] ${
-                              row.status === "AUTHENTIC"
-                                ? "bg-emerald-100 text-emerald-800"
-                                : row.status === "SUSPICIOUS"
-                                ? "bg-amber-100 text-amber-800"
-                                : row.status === "FORGED"
-                                ? "bg-rose-100 text-rose-700"
-                                : row.status === "PROCESSING"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {row.status}
-                          </span>
-                        </div>
-
-                        <div className="mt-2 text-sm text-[#344054]">
-                          <p>
-                            <span className="font-medium">File:</span>{" "}
-                            {row.fileName}
-                          </p>
-                          <p>
-                            <span className="font-medium">Certificate ID:</span>{" "}
-                            {row.id.substring(0, 8).toUpperCase()}
-                          </p>
-                          <p>
-                            <span className="font-medium">Type:</span>{" "}
-                            {row.certificateType}
-                          </p>
-                          <p>
-                            <span className="font-medium">Confidence:</span>{" "}
-                            {row.confidenceScore
-                              ? `${row.confidenceScore.toFixed(1)}%`
-                              : "N/A"}
-                          </p>
-                        </div>
-
-                        <div className="mt-3 flex justify-end">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger className="text-slate-400 hover:text-slate-600">
-                              <MoreHorizontal size={18} />
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end" className="w-40">
-                              <DropdownMenuItem
-                                onSelect={() =>
-                                  navigate(`/dashboard/verification/${row.id}`)
-                                }
-                              >
-                                View Verification
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                Download Analysis
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-rose-600"
-                                onSelect={() => {
-                                  setSelectedId(row.id);
-                                  setDeleteOpen(true);
-                                }}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             )}
           </div>
-
-          {!loading && verifications.length > 0 && (
-            <div className="p-4 border-t">
-              <div className="flex items-center justify-between">
-                {/* Previous */}
-                <div>
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className="inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm bg-white text-slate-700"
-                  >
-                    <ArrowLeft size={16} />
-                    <span>Previous</span>
-                  </button>
-                </div>
-
-                {/* Page numbers */}
-                <div>
-                  <div className="inline-flex items-center gap-2">
-                    {(() => {
-                      const pages: (number | string)[] = [];
-                      const total = totalPages;
-                      if (total <= 7) {
-                        for (let i = 1; i <= total; i++) pages.push(i);
-                      } else {
-                        // always show first 2
-                        pages.push(1, 2);
-                        const left = Math.max(3, page - 1);
-                        const right = Math.min(total - 2, page + 1);
-                        if (left > 3) pages.push("...");
-                        for (let i = left; i <= right; i++) pages.push(i);
-                        if (right < total - 2) pages.push("...");
-                        pages.push(total - 1, total);
-                      }
-
-                      return pages.map((pVal, idx) =>
-                        typeof pVal === "string" ? (
-                          <div
-                            key={`e-${idx}`}
-                            className="px-2 text-sm text-slate-400"
-                          >
-                            {pVal}
-                          </div>
-                        ) : (
-                          <button
-                            key={pVal}
-                            onClick={() => setPage(pVal)}
-                            className={`inline-flex items-center justify-center text-sm rounded-md w-8 h-8 ${
-                              pVal === page
-                                ? "bg-[#EAECF0] text-slate-900 shadow-sm border "
-                                : "bg-transparent text-slate-600"
-                            }`}
-                          >
-                            {pVal}
-                          </button>
-                        )
-                      );
-                    })()}
-                  </div>
-                </div>
-
-                {/* Next */}
-                <div>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page >= totalPages}
-                    className="inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm bg-white text-slate-700"
-                  >
-                    <span>Next</span>
-                    <ArrowRight size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </section>
       </div>
-      {deleteOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="fixed inset-0 bg-black/60"
-            onClick={() => setDeleteOpen(false)}
-          />
-
-          <div className="relative bg-white rounded-md text-center shadow-lg w-[420px]">
-            <div className="p-4 border-b">
-              <h3 className="text-base font-semibold text-[#101828]">
-                Delete Verification Result
-              </h3>
-            </div>
-
-            <div className="p-6">
-              <p className="text-sm text-slate-600 mb-4">
-                Are you sure you want to Delete this verification Result
-              </p>
-              <div className="flex gap-3 justify-center mt-5">
-                <button
-                  className="px-10 py-2 rounded-md bg-emerald-600 text-white"
-                  onClick={() => {
-                    setSelectedId(null);
-                    setDeleteOpen(false);
-                  }}
-                >
-                  No, Cancel
-                </button>
-
-                <button
-                  className="px-10 py-2 rounded-md bg-rose-600 text-white"
-                  onClick={() => {
-                    if (selectedId) {
-                      handleDelete(selectedId);
-                    }
-                  }}
-                >
-                  Yes, Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </DashboardLayout>
   );
 }

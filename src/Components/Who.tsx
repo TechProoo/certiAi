@@ -80,20 +80,26 @@ const Who = () => {
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row sm:justify-center gap-4">
-              <motion.a
-                href="/get-started"
-                className="inline-flex items-center justify-center px-15 py-2 bg-white rounded-full shadow-sm hover:shadow-md transition"
+              <motion.div
                 whileHover={{ scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <Link to={"signup"} className="font-medium">
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center justify-center px-15 py-2 bg-white rounded-full shadow-sm hover:shadow-md transition font-medium"
+                  style={{ borderRadius: "9999px" }}
+                >
                   Get Started
+                  <MoveRight className="ml-3" size={20} />
                 </Link>
-                <MoveRight className="ml-3" size={20} />
-              </motion.a>
+              </motion.div>
 
               <motion.a
                 href="/api-docs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "/api-docs";
+                }}
                 className="inline-flex items-center justify-center px-6 py-3 border border-white/30 text-white rounded-full hover:bg-white/5 transition"
                 whileHover={{ scale: 1.02 }}
               >

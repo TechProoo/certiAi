@@ -101,7 +101,7 @@ const Upload = () => {
                   setUploading(false);
                 }
               }}
-              className={`px-6 py-3 rounded-md text-white transition ${
+              className={`w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 rounded-md text-white transition text-sm sm:text-base ${
                 files.length === 0 || uploading
                   ? "bg-slate-300 cursor-not-allowed"
                   : "bg-slate-900 hover:bg-slate-800"
@@ -324,35 +324,38 @@ const Upload = () => {
             </div>
           )}
         </div>
-      {/* Coming Soon Modal */}
-      {showComingSoon && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center relative animate-fade-in">
-            <button
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
-              onClick={() => setShowComingSoon(false)}
-              aria-label="Close"
-            >
-              <X size={24} />
-            </button>
-            <div className="flex flex-col items-center gap-4">
-              <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-4 mb-2">
-                <UploadCloud size={48} className="text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Coming Soon!</h2>
-              <p className="text-base text-slate-600 mb-4">
-                This certificate type will be available soon.<br />
-                We’re working hard to bring you more verification options.
-              </p>
-              <div className="mt-2">
-                <span className="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-semibold text-sm">
-                  Stay tuned for updates!
-                </span>
+        {/* Coming Soon Modal */}
+        {showComingSoon && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center relative animate-fade-in">
+              <button
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
+                onClick={() => setShowComingSoon(false)}
+                aria-label="Close"
+              >
+                <X size={24} />
+              </button>
+              <div className="flex flex-col items-center gap-4">
+                <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-4 mb-2">
+                  <UploadCloud size={48} className="text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                  Coming Soon!
+                </h2>
+                <p className="text-base text-slate-600 mb-4">
+                  This certificate type will be available soon.
+                  <br />
+                  We’re working hard to bring you more verification options.
+                </p>
+                <div className="mt-2">
+                  <span className="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-semibold text-sm">
+                    Stay tuned for updates!
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </DashboardLayout>
   );

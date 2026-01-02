@@ -183,6 +183,10 @@ export default function Dashboard() {
               {/* Docs */}
               <a
                 href="/api-docs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "/api-docs";
+                }}
                 className="relative p-4 bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition cursor-pointer"
               >
                 <span className="absolute -inset-3 rounded-lg blur-3xl opacity-20 bg-emerald-100" />

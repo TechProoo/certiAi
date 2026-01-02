@@ -12,8 +12,8 @@ const Hero = () => {
             Verify Educational Certificates Instantly with AI.
           </h1>
           <p className="mt-5 heading">
-            With lots of unique blocks, you can easily build a page without
-            coding. Build your next consultancy website within few minutes.
+            Upload certificates, detect forgery, and verify academic credentials
+            securely in seconds.
           </p>
           <Link to={"signup"} className="mt-5">
             Get Started

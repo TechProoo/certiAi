@@ -17,6 +17,7 @@ import Upload from "./Pages/dashboard/Upload";
 import VerificationHistory from "./Pages/dashboard/History";
 import Reports from "./Pages/dashboard/Reports";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import APIDocsComingSoon from "./Pages/APIDocsComingSoon";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -103,6 +104,7 @@ function App() {
               </ProtectedRoute>
             }
           ></Route>
+          <Route path="/api-docs" element={<APIDocsComingSoon />} />
         </Routes>
       </motion.div>
     </>

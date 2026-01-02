@@ -8,7 +8,15 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const isAuthenticated = authAPI.isAuthenticated();
 
-  const links = ["Home", "Features", "How it works", "Developers"];
+  const links = [
+    { label: "Home", to: "/" },
+    { label: "How it works", to: "/#how-it-works" },
+    { label: "Features", to: "/#features" },
+    {
+      label: "Verify Certificate",
+      to: isAuthenticated ? "/dashboard/upload" : "/signin",
+    },
+  ];
 
   return (
     <motion.header
@@ -26,9 +34,9 @@ const Navbar = () => {
           {/* desktop links */}
           <nav className="hidden md:block">
             <ul className="flex gap-6 items-center text-sm text-gray-700 dark:text-gray-200">
-              {links.map((l) => (
-                <li key={l} className="hover:underline cursor-pointer">
-                  {l}
+              {links.map((link) => (
+                <li key={link.label} className="hover:underline cursor-pointer">
+                  <Link to={link.to}>{link.label}</Link>
                 </li>
               ))}
             </ul>
@@ -38,12 +46,12 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {/* desktop actions */}
           <div className="hidden md:flex gap-4">
-            <a
-              href="/api-docs"
+            <Link
+              to="/api-docs"
               className="text-sm px-4 py-2 rounded-md border border-white/10"
             >
               API Documentation
-            </a>
+            </Link>
             <Link
               to={isAuthenticated ? "/dashboard" : "/signup"}
               className="text-sm px-4 py-2 rounded-md bg-white text-purple-900"
@@ -77,20 +85,20 @@ const Navbar = () => {
           >
             <div className="mx-4 rounded-lg bg-white/5 dark:bg-gray-900/80 p-4 shadow-lg">
               <ul className="flex flex-col gap-3 text-gray-800 dark:text-gray-100">
-                {links.map((l) => (
-                  <li key={l} className="py-2 border-b border-white/5">
-                    {l}
+                {links.map((link) => (
+                  <li key={link.label} className="py-2 border-b border-white/5">
+                    <Link to={link.to}>{link.label}</Link>
                   </li>
                 ))}
               </ul>
 
               <div className="mt-4 flex flex-col gap-3">
-                <a
-                  href="/api-docs"
+                <Link
+                  to="/api-docs"
                   className="block text-center px-4 py-2 rounded-md border border-white/10"
                 >
                   API Documentation
-                </a>
+                </Link>
                 <Link
                   to={isAuthenticated ? "/dashboard" : "/signup"}
                   className="block text-center px-4 py-2 rounded-md bg-white text-purple-900"

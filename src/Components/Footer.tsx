@@ -24,7 +24,14 @@ const Footer = () => {
               Privacy Policy
             </a>
             <span className="hidden md:inline text-gray-300">•</span>
-            <a href="/api-docs" className="hover:underline">
+            <a
+              href="/api-docs"
+              className="hover:underline"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = "/api-docs";
+              }}
+            >
               API Docs
             </a>
           </nav>
